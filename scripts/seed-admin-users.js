@@ -1,7 +1,28 @@
 const { MongoClient } = require("mongodb");
 const { scryptSync, randomBytes } = require("crypto");
+const dns = require("node:dns");
+const fs = require("node:fs");
+const path = require("node:path");
 
-const uri = "mongodb://sptechteamseo_db_user:IeIEFUO7vs1o3So7@ac-ffh4nji-shard-00-00.a1kfcpz.mongodb.net:27017,ac-ffh4nji-shard-00-01.a1kfcpz.mongodb.net:27017,ac-ffh4nji-shard-00-02.a1kfcpz.mongodb.net:27017/ai-service?replicaSet=atlas-fktiuk-shard-0&authSource=admin&ssl=true&retryWrites=true&w=majority";
+// Read MONGODB_URI from .env.local so this stays in sync with the app and we
+// never hardcode (stale) credentials/cluster here.
+function loadMongoUri() {
+  const envPath = path.resolve(__dirname, "..", ".env.local");
+  const line = fs
+    .readFileSync(envPath, "utf8")
+    .split(/\r?\n/)
+    .find((l) => l.startsWith("MONGODB_URI="));
+  if (!line) throw new Error("MONGODB_URI not found in .env.local");
+  return line.slice("MONGODB_URI=".length).trim();
+}
+
+// Local-only: the system resolver refuses SRV lookups, so point Node at public
+// DNS (same workaround the app uses in lib/mongodb.ts).
+const broken = (s) => s.length === 0 || s.every((x) => x.startsWith("127."));
+if (broken(dns.getServers())) dns.setServers(["8.8.8.8", "1.1.1.1"]);
+if (broken(dns.promises.getServers())) dns.promises.setServers(["8.8.8.8", "1.1.1.1"]);
+
+const uri = loadMongoUri();
 
 function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");
