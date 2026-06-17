@@ -13,7 +13,7 @@ export const SERVICES: Service[] = [
     ],
     ctaLabel: "Start an MVP",
     description:
-      "Idea to live product in two weeks. We pick the smallest version of your product that a real user could pay for, and we ship it. Fixed scope, fixed price, fixed timeline.",
+      "Idea to live product in two weeks. We pick smallest version of your product that a real user could pay for, and we ship it. Fixed scope, fixed price, fixed timeline.",
     sectionTitle: "What you get",
     items: [
       "Production web app with auth & payments",
