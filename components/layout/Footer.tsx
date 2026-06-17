@@ -64,14 +64,7 @@ export function Footer() {
                 marginBottom: 14,
               }}
             >
-              <Image
-                src="/assets/askthegenie-logo-dark.svg"
-                alt="Ask the Genie"
-                width={30}
-                height={30}
-                unoptimized
-                style={{ objectFit: "contain" }}
-              />
+            
               <b style={{ fontWeight: 600 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;&gt;</b>
             </Link>
             <p

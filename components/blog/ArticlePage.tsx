@@ -203,7 +203,7 @@ export function ArticlePage({ post, related }: Props) {
       <div style={{ maxWidth: 1100, margin: "64px auto 0", padding: "0 40px" }}>
         <div style={{ maxWidth: 820, marginLeft: "auto", marginRight: "auto", border: "1px solid var(--line)", borderRadius: 18, background: "var(--bg-1)", padding: "32px 36px", display: "flex", gap: 22, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ width: 60, height: 60, borderRadius: 14, border: "1px solid var(--line-strong)", background: "var(--bg-2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-mono)", fontSize: 18, color: "var(--accent)", fontWeight: 500, flexShrink: 0 }}>{post.authorInitials}</div>
-          <div style={{ flex: 1, minWidth: 260 }}>
+          <div style={{ flex: 1, minWidth: 140 }}>
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--fg-faint)", marginBottom: 8 }}>Written by</div>
             <h4 style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-0.01em", margin: 0 }}>{post.author}</h4>
           </div>
@@ -228,7 +228,7 @@ export function ArticlePage({ post, related }: Props) {
             <h3 style={{ fontWeight: 500, letterSpacing: "-0.02em", fontSize: 24, margin: 0 }}>More field notes</h3>
             <Link href="/blog" style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--accent)", textDecoration: "none", letterSpacing: "0.06em" }}>All articles →</Link>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%, 300px),1fr))", gap: 16 }}>
             {related.map(p => {
               const h = CAT_HUE[p.category] ?? "93,139,244";
               return (
@@ -273,10 +273,15 @@ export function ArticlePage({ post, related }: Props) {
         .article-prose hr { border: none; border-top: 1px solid var(--line); margin: 8px 0; }
         .article-prose img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
 
+        .article-prose { min-width: 0; }
+
         @media (max-width: 900px) {
-          .article-grid { grid-template-columns: 1fr !important; }
+          .article-grid { grid-template-columns: minmax(0, 1fr) !important; }
           .article-aside { display: none !important; }
           .article-cta { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 600px) {
+          .article-grid { padding-left: 20px !important; padding-right: 20px !important; }
         }
       `}</style>
     </>

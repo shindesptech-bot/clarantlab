@@ -26,13 +26,13 @@ export function CtaStrip({
         padding: 56,
         background: "radial-gradient(circle at 0% 0%, rgba(93,139,244,0.1), transparent 60%), var(--bg-1)",
         display: "grid",
-        gridTemplateColumns: "1fr auto",
+        gridTemplateColumns: "minmax(0, 1fr) auto",
         gap: 40,
         alignItems: "center",
       }}
     >
-      <div>
-        <h2 style={{ fontSize: "clamp(28px, 3.4vw, 44px)", maxWidth: "22ch" }}>
+      <div style={{ minWidth: 0 }}>
+        <h2 style={{ fontSize: "clamp(28px, 3.4vw, 44px)", maxWidth: "22ch", overflowWrap: "break-word" }}>
           {heading}
         </h2>
         <p style={{ color: "var(--fg-dim)", marginTop: 10, maxWidth: "50ch" }}>
@@ -40,7 +40,7 @@ export function CtaStrip({
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: 12, flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: 12, flexShrink: 0, flexWrap: "wrap" }}>
         <GeniButton href={primaryHref} variant="primary">
           {primaryLabel} <span>↗</span>
         </GeniButton>

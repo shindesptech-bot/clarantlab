@@ -41,14 +41,7 @@ export function Navbar() {
         >
           {/* Brand */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "-0.01em" }}>
-            <Image
-              src="/assets/askthegenie-logo-dark.svg"
-              alt="Ask the Genie"
-              width={30}
-              height={30}
-              unoptimized
-              style={{ objectFit: "contain", flexShrink: 0 }}
-            />
+          
             <b style={{ fontWeight: 600, letterSpacing: 0 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;&gt;</b>
           </Link>
 
@@ -197,7 +190,7 @@ export function Navbar() {
       )}
 
       <style>{`
-        @media (max-width: 760px) {
+        @media (max-width: 900px) {
           .nav-inner { gap: 14px !important; }
           .nav-links-desktop { display: none !important; }
           .nav-cta { display: none !important; }

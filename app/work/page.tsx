@@ -120,7 +120,7 @@ export default function WorkPage() {
             {/* Body */}
             <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 64, alignItems: "start" }} className="case-body-grid">
               {/* Sidebar */}
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, display: "flex", flexDirection: "column", gap: 18, position: "sticky", top: 100 }}>
+              <div className="case-sidebar" style={{ fontFamily: "var(--font-mono)", fontSize: 12, display: "flex", flexDirection: "column", gap: 18, position: "sticky", top: 100 }}>
                 {c.sidebar.map((b) => (
                   <div key={b.label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     <span style={{ color: "var(--fg-faint)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</span>
@@ -152,7 +152,7 @@ export default function WorkPage() {
                   <p style={{ color: "var(--fg-dim)", fontSize: 16, lineHeight: 1.65 }}>{c.aiNote}</p>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }} className="results-grid">
                   {c.results.map((r) => (
                     <div key={r.label} style={{ background: "var(--bg-1)", border: "1px solid var(--line)", padding: 20, borderRadius: "var(--radius-md)" }}>
                       <b style={{ fontSize: 28, fontWeight: 500, color: "var(--accent)", letterSpacing: "-0.02em", display: "block" }}>{r.value}</b>
@@ -183,9 +183,11 @@ export default function WorkPage() {
           .client-row { grid-template-columns: repeat(3, 1fr) !important; }
           .case-head-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
           .case-body-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .case-sidebar { position: static !important; }
         }
         @media (max-width: 700px) {
           .metrics-strip { grid-template-columns: 1fr 1fr !important; }
+          .results-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
     </>

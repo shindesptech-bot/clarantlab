@@ -78,12 +78,12 @@ export default function ContactPage() {
             <InfoBlock title="Direct">
               <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, display: "flex", flexDirection: "column", gap: 8 }}>
                 {DIRECT.map((d) => (
-                  <div key={d.label} style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                    <span style={{ color: "var(--fg-faint)" }}>{d.label}</span>
+                  <div key={d.label} style={{ display: "flex", justifyContent: "space-between", gap: 12, minWidth: 0 }}>
+                    <span style={{ color: "var(--fg-faint)", flexShrink: 0 }}>{d.label}</span>
                     {d.href ? (
-                      <a href={d.href} style={{ color: "var(--accent)", textDecoration: "none" }} className="direct-link">{d.value}</a>
+                      <a href={d.href} style={{ color: "var(--accent)", textDecoration: "none", overflowWrap: "anywhere", textAlign: "right", minWidth: 0 }} className="direct-link">{d.value}</a>
                     ) : (
-                      <span style={{ color: "var(--fg)" }}>{d.value}</span>
+                      <span style={{ color: "var(--fg)", overflowWrap: "anywhere", textAlign: "right", minWidth: 0 }}>{d.value}</span>
                     )}
                   </div>
                 ))}

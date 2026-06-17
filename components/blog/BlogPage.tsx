@@ -62,7 +62,12 @@ function FeaturedCard({ post }: { post: PublicPost }) {
         </div>
         {/* Image side */}
         <div style={{ flex: "1 1 340px", position: "relative", minHeight: 320, background: "var(--bg-2)", borderLeft: "1px solid var(--line)" }}>
-          <div style={cardImg(hue)} />
+          {post.featuredImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={post.featuredImage} alt={post.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <div style={cardImg(hue)} />
+          )}
           <span style={{ position: "absolute", top: 22, left: 24, fontFamily: "var(--font-mono)", fontSize: 10.5, color: "rgba(245,245,245,0.4)", letterSpacing: "0.1em", textTransform: "uppercase" }}>/blog · featured</span>
           <span style={{ position: "absolute", bottom: 22, right: 24, fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--fg-faint)", letterSpacing: "0.1em" }}>{post.readTime}</span>
           <span style={{ position: "absolute", bottom: 22, left: 24, fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--fg-faint)", letterSpacing: "0.08em" }}>{post.tags.join("  ·  ")}</span>
@@ -83,7 +88,12 @@ function PostCard({ post }: { post: PublicPost }) {
       className="post-card"
     >
       <div style={{ position: "relative", height: 172, background: "var(--bg-2)", overflow: "hidden" }}>
-        <div style={cardImg(hue)} />
+        {post.featuredImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={post.featuredImage} alt={post.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <div style={cardImg(hue)} />
+        )}
         <span style={{ position: "absolute", bottom: 14, left: 16, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--fg-faint)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{post.readTime} read</span>
       </div>
       <div style={{ padding: "22px 22px 24px", display: "flex", flexDirection: "column", gap: 13, flex: 1 }}>
@@ -270,7 +280,7 @@ export function BlogPage({ posts }: { posts: PublicPost[] }) {
         {/* Grid */}
         <div style={{ paddingTop: 40, paddingBottom: 16 }}>
           {gridPosts.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%, 330px),1fr))", gap: 16 }}>
               {gridPosts.map(p => <PostCard key={p.slug} post={p} />)}
             </div>
           ) : (

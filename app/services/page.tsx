@@ -26,7 +26,7 @@ const TIMELINE_CELLS = [
 
 function TimelineVis() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 3, fontFamily: "var(--font-mono)", fontSize: 11 }}>
+    <div className="timeline-grid" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 3, fontFamily: "var(--font-mono)", fontSize: 11 }}>
       {TIMELINE_CELLS.map((c) => (
         <div
           key={c.d}
@@ -72,7 +72,7 @@ export default function ServicesPage() {
             }}
           >
             {/* Sticky left */}
-            <div style={{ position: "sticky", top: 100 }}>
+            <div className="service-left" style={{ position: "sticky", top: 100 }}>
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -147,7 +147,7 @@ export default function ServicesPage() {
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px", border: "1px solid var(--accent-line)", background: "var(--accent-soft)", borderRadius: "var(--radius-md)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px", border: "1px solid var(--accent-line)", background: "var(--accent-soft)", borderRadius: "var(--radius-md)", flexWrap: "wrap" }}>
                 <b style={{ fontSize: 18 }}>{svc.callout}</b>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--fg-dim)", letterSpacing: "0.1em", textTransform: "uppercase", marginLeft: "auto", flexShrink: 0 }}>
                   {svc.calloutSub}
@@ -174,9 +174,14 @@ export default function ServicesPage() {
       <style>{`
         @media (max-width: 900px) {
           .service-row { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .service-left { position: static !important; }
         }
         @media (max-width: 700px) {
           .includes-list { grid-template-columns: 1fr !important; }
+          .timeline-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        @media (max-width: 460px) {
+          .timeline-grid { grid-template-columns: repeat(3, 1fr) !important; }
         }
       `}</style>
     </>
