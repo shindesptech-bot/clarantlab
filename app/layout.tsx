@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s — Build with Genie",
   },
   description:
-    "We design, architect, build, test and deliver production software using Claude, Gemini and OpenAI on every step. A senior pod, not a body shop.",
+    "We design, architect, build, test and deliver production software using Claude, Gemini and OpenAI every step. A senior pod, not a body shop.",
   keywords: ["AI development", "software agency", "Claude Code", "MVP", "Next.js"],
   authors: [{ name: "Build with Genie" }],
   openGraph: {
