@@ -45,6 +45,8 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
 
   if (!cached.promise) {
     const MONGODB_URI = process.env.MONGODB_URI;
+
+   
     if (!MONGODB_URI) {
       throw new Error("Please define the MONGODB_URI environment variable");
     }
@@ -56,6 +58,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
 
   try {
     cached.conn = await cached.promise;
+    
   } catch (err) {
     // Reset so a transient failure (e.g. DNS) can be retried on the next
     // request instead of being cached as a permanently-rejected promise.
