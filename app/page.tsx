@@ -10,7 +10,7 @@ import { FaqAccordion } from "@/components/ui/FaqAccordion";
 import { CtaStrip } from "@/components/ui/CtaStrip";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { TestimonialsSection } from "@/components/services/TestimonialsSection";
-import { HOME_FAQ } from "@/constants/pricing";
+import { HOME_FAQ } from "@/constants/faq";
 
 export const metadata: Metadata = {
   title: "Build with Genie — Ship faster with AI",
@@ -126,8 +126,6 @@ export default function HomePage() {
             body="Show it to us. 30 minutes, no pitch deck, no slides. We'll tell you the smallest version we'd ship and how long it'd take."
             primaryLabel="Book a scoping call"
             primaryHref="/contact"
-            secondaryLabel="See pricing"
-            secondaryHref="/pricing"
           />
         </div>
       </section>

@@ -42,7 +42,7 @@ export function Navbar() {
           {/* Brand */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "-0.01em" }}>
           
-            <b style={{ fontWeight: 600, letterSpacing: 0 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;&gt;</b>
+            <b style={{ fontWeight: 600, letterSpacing: 0 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;/&gt;</b>
           </Link>
 
           {/* Desktop nav links */}

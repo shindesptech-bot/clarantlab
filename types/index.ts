@@ -125,36 +125,6 @@ export interface UseCase {
   faqs: FaqItem[];
 }
 
-// ─── Pricing ──────────────────────────────────────────────────────────────────
-
-export interface PricingTier {
-  badge: string;
-  name: string;
-  description: string;
-  price: string;
-  priceSuffix: string;
-  priceFrom?: boolean;
-  features: string[];
-  ctaLabel: string;
-  featured?: boolean;
-}
-
-export interface EstimatorQuestion {
-  id: string;
-  label: string;
-  options: EstimatorOption[];
-}
-
-export interface EstimatorOption {
-  v: string | number;
-  l: string;
-  mult?: number;
-  base?: number;
-  days?: number;
-  weeks?: number;
-  add?: number;
-}
-
 // ─── Contact form ─────────────────────────────────────────────────────────────
 
 export interface ContactFormData {

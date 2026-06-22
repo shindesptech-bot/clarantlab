@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SEARCH_INDEXING_ENABLED } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +26,15 @@ export const metadata: Metadata = {
     title: "Build with Genie",
     description: "Ship software at Genie speed — without a 30-person team.",
   },
-  robots: { index: true, follow: true },
+  // Driven by the SEARCH_INDEXING_ENABLED master switch in lib/seo.ts.
+  robots: SEARCH_INDEXING_ENABLED
+    ? { index: true, follow: true }
+    : {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: { index: false, follow: false },
+      },
 };
 
 export default function RootLayout({

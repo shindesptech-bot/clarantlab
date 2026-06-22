@@ -16,7 +16,6 @@ const footerSections = [
     title: "Company",
     links: [
       { label: "Work", href: "/work" },
-      { label: "Pricing", href: "/pricing" },
       { label: "Contact", href: "/contact" },
     ],
   },
@@ -65,7 +64,7 @@ export function Footer() {
               }}
             >
             
-              <b style={{ fontWeight: 600 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;&gt;</b>
+              <b style={{ fontWeight: 600 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;/&gt;</b>
             </Link>
             <p
               style={{
