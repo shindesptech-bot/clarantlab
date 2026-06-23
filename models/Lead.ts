@@ -6,11 +6,7 @@ const LeadSchema = new Schema<ILead>(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     company: { type: String, required: true, trim: true },
-    role: { type: String, trim: true },
-    fit: { type: String, required: true },
-    budget: { type: String, required: true },
-    timeline: { type: String, required: true },
-    summary: { type: String, required: true },
+    phone: { type: String, trim: true },
   },
   { timestamps: true }
 );

@@ -128,24 +128,17 @@ export interface UseCase {
 // ─── Contact form ─────────────────────────────────────────────────────────────
 
 export interface ContactFormData {
-  fit: string;
-  budget: string;
-  timeline: string;
-  summary: string;
   name: string;
-  company: string;
   email: string;
-  role: string;
+  company: string;
+  phone: string;
 }
 
 export interface ContactFormErrors {
-  fit?: string;
-  budget?: string;
-  timeline?: string;
-  summary?: string;
   name?: string;
-  company?: string;
   email?: string;
+  company?: string;
+  phone?: string;
 }
 
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
@@ -224,11 +217,7 @@ export interface ILead {
   name: string;
   email: string;
   company: string;
-  role?: string;
-  fit: string;
-  budget: string;
-  timeline: string;
-  summary: string;
+  phone?: string;
   createdAt?: Date;
 }
 

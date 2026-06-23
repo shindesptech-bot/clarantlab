@@ -5,7 +5,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Tell us about your project. Three steps. Two minutes. No pitch deck.",
+    "Tell us about your project. A few details. Two minutes. No pitch deck.",
 };
 
 const WHAT_NEXT = [
@@ -44,7 +44,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Get in touch"
         heading="Tell us about it. We'll reply today."
-        lede="Three steps. Two minutes. No pitch deck. Either we're a good fit and we'll book a 30-min call, or we'll tell you who is."
+        lede="A few details. Two minutes. No pitch deck. Either we're a good fit and we'll book a 30-min call, or we'll tell you who is."
       />
 
       <div className="wrap">

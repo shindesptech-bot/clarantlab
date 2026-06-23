@@ -40,9 +40,21 @@ export function Navbar() {
           }}
         >
           {/* Brand */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "-0.01em" }}>
-          
-            <b style={{ fontWeight: 600, letterSpacing: 0 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;/&gt;</b>
+          <Link href="/" style={{ display: "flex", alignItems: "center", fontFamily: "var(--font-mono)", fontSize: 13 }}>
+            <b
+              style={{
+                fontWeight: 600,
+                display: "inline-flex",
+                alignItems: "baseline",
+                gap: "0.5em",
+                letterSpacing: "0.04em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <span style={{ color: "var(--fg-faint)" }}>&lt;</span>
+              <span>BUILD WITH GENIE</span>
+              <span style={{ color: "var(--fg-faint)" }}>/&gt;</span>
+            </b>
           </Link>
 
           {/* Desktop nav links */}

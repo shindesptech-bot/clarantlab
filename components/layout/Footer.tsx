@@ -64,7 +64,11 @@ export function Footer() {
               }}
             >
             
-              <b style={{ fontWeight: 600 }}>&lt;&nbsp;BUILD&nbsp;WITH&nbsp;GENIE&nbsp;/&gt;</b>
+             <b style={{ display: "inline-flex", alignItems: "baseline", gap: "0.5em", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
+  <span style={{ color: "var(--fg-faint)" }}>&lt;</span>
+  <span>BUILD WITH GENIE</span>
+  <span style={{ color: "var(--fg-faint)" }}>/&gt;</span>
+</b>
             </Link>
             <p
               style={{
