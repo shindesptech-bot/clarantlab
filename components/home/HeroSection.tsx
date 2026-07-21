@@ -47,7 +47,7 @@ export function HeroSection() {
             >
               We design, architect, build, test and deliver production software
               using Claude, Gemini and OpenAI on every step. Make a wish, get
-              the build. A senior pod, not a body shop.
+              the build.
             </p>
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
