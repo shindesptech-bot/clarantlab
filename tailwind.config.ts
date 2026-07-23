@@ -47,10 +47,24 @@ const config: Config = {
         card: { DEFAULT: "var(--bg-1)", foreground: "var(--fg)" },
       },
 
-      // ─── Typography ────────────────────────────────────────────────────────
+      // ─── Typography — LOCKED (Space Grotesk display, Inter body) ────────────
       fontFamily: {
-        sans: ["Geist", "Helvetica Neue", "Helvetica", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        sans: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+        body: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+      },
+      fontSize: {
+        xs: "12px",
+        sm: "14px",
+        base: "16px",
+        lg: "18px",
+        xl: "22px",
+        "2xl": "28px",
+        "3xl": "36px",
+        "4xl": "48px",
+        "5xl": "64px",
+        "6xl": "88px",
       },
 
       // ─── Border radius ─────────────────────────────────────────────────────

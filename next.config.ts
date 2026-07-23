@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
 
   // Allow Cloudinary images
   images: {
+    // Next 16 defaults qualities to [75]; allow 90 for the high-detail hero visual.
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: "https",
