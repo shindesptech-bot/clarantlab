@@ -82,7 +82,7 @@ export function BookingSection() {
   }
 
   const cardStyle: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 18, background: "rgba(255,255,255,0.02)", padding: "clamp(22px,3vw,32px)" };
-  const labelStyle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--fg-soft)", margin: "0 0 22px" };
+  const labelStyle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--fg-soft)", margin: "0 0 22px" };
 
   return (
     <section id="book" style={{ background: "linear-gradient(180deg, var(--bg-0), var(--bg-footer))" }}>
@@ -97,7 +97,7 @@ export function BookingSection() {
                   <span style={{ display: "inline-flex", width: 40, height: 40, borderRadius: 11, alignItems: "center", justifyContent: "center", background: "var(--accent-soft)", border: "1px solid var(--accent-line)" }}>
                     <Icon paths={pr.paths} size={18} />
                   </span>
-                  <span style={{ fontSize: 12, fontWeight: 500, lineHeight: 1.3, color: "var(--fg-dim)" }}>{pr.label}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.3, color: "var(--fg-dim)" }}>{pr.label}</span>
                 </div>
               ))}
             </div>
@@ -127,7 +127,7 @@ export function BookingSection() {
                   {INDUSTRY_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
                 <textarea rows={4} value={data.message} onChange={(e) => set("message", e.target.value)} placeholder="Tell us about your business challenges*" style={textareaStyle} aria-label="Message" />
-                {formError && <div style={{ fontSize: 12.5, color: "#F87171" }}>{formError}</div>}
+                {formError && <div style={{ fontSize: 16, color: "#F87171" }}>{formError}</div>}
                 <button type="submit" disabled={submitting} className="energy-btn energy-btn-full" style={{ marginTop: 4, opacity: submitting ? 0.7 : 1 }}>
                   <span className="energy-shimmer" />
                   <span style={{ position: "relative", zIndex: 2, display: "inline-flex", alignItems: "center", gap: 9 }}>

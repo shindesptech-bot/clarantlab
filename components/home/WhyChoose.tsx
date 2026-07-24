@@ -85,14 +85,14 @@ export function WhyChoose() {
                 </span>
                 <h3 style={{ fontSize: "clamp(21px,2.5vw,29px)", fontWeight: 700, letterSpacing: "-0.02em", margin: "0 0 12px", color: "#fff" }}>{active.title}</h3>
                 <p style={{ fontSize: "clamp(15px,1.6vw,17px)", lineHeight: 1.55, color: "rgba(255,255,255,0.75)", margin: "0 0 12px", maxWidth: 540 }}>{active.desc}</p>
-                <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "rgba(255,255,255,0.55)", margin: "0 0 22px", maxWidth: 540 }}>{active.support}</p>
+                <p style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.55)", margin: "0 0 22px", maxWidth: 540 }}>{active.support}</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 26 }}>
                   {active.bullets.map((b) => (
                     <div key={b} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                       <span style={{ flex: "none", marginTop: 2, color: "var(--accent-bright)" }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
                       </span>
-                      <span style={{ fontSize: 13.5, lineHeight: 1.4, color: "rgba(255,255,255,0.82)" }}>{b}</span>
+                      <span style={{ fontSize: 16, lineHeight: 1.4, color: "rgba(255,255,255,0.82)" }}>{b}</span>
                     </div>
                   ))}
                 </div>

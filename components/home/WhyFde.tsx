@@ -54,7 +54,7 @@ export function WhyFde() {
           <div ref={scan.ref}>
             <div className="eyebrow" style={{ marginBottom: 14 }}>Why Build with Genie</div>
             <h3 style={{ margin: "0 0 16px", color: "var(--fg)" }}>Forward Deployed Engineers Who Deliver Real Impact</h3>
-            <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--fg-dim)", margin: "0 0 24px" }}>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: "var(--fg-dim)", margin: "0 0 24px" }}>
               Our Forward Deployed Engineers (FDEs) become an extension of your team, combining AI expertise with business understanding to solve real challenges and drive measurable results.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -82,7 +82,7 @@ export function WhyFde() {
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
                     </span>
-                    <span style={{ fontSize: 14.5, color: "var(--fg)" }}>{ck}</span>
+                    <span style={{ fontSize: 16, color: "var(--fg)" }}>{ck}</span>
                   </div>
                 );
               })}
@@ -131,8 +131,8 @@ export function WhyFde() {
                       <Icon paths={pl.paths} size={13} />
                     </span>
                     <div>
-                      <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 600, color: "var(--fg)", lineHeight: 1.2 }}>{pl.title}</div>
-                      <div style={{ fontSize: 11.5, color: "var(--fg-faint)", marginTop: 2 }}>{pl.sub}</div>
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--fg)", lineHeight: 1.2 }}>{pl.title}</div>
+                      <div style={{ fontSize: 12.5, color: "var(--fg-faint)", marginTop: 2 }}>{pl.sub}</div>
                     </div>
                   </div>
                 ))}
@@ -142,12 +142,12 @@ export function WhyFde() {
 
           {/* RIGHT — FDE photo */}
           <div>
-            <div style={{ position: "relative", borderRadius: 18, overflow: "hidden", minHeight: 320, height: "100%", border: "1px solid var(--line)" }}>
+            <div style={{ position: "relative", borderRadius: 18, overflow: "hidden", minHeight: 380, height: "100%", border: "1px solid var(--line)" }}>
               <Image src="/assets/fde-team.png" alt="Forward Deployed Engineers collaborating with a client team" fill sizes="(max-width: 900px) 100vw, 33vw" style={{ objectFit: "cover" }} />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(11,15,25,0.15) 30%, rgba(11,15,25,0.9))", pointerEvents: "none" }} />
               <div style={{ position: "absolute", left: 22, right: 22, bottom: 22, pointerEvents: "none" }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.01em", margin: "0 0 8px", color: "#fff" }}>Your FDE Becomes Part of Your Team</h3>
-                <p style={{ fontSize: 13.5, lineHeight: 1.55, color: "var(--fg-dim)", margin: 0 }}>Working side-by-side from discovery to deployment and beyond.</p>
+                <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", margin: "0 0 8px", color: "#fff" }}>Your FDE Becomes Part of Your Team</h3>
+                <p style={{ fontSize: 16, lineHeight: 1.55, color: "var(--fg-dim)", margin: 0 }}>Working side-by-side from discovery to deployment and beyond.</p>
               </div>
             </div>
           </div>

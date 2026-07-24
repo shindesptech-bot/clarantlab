@@ -27,7 +27,7 @@ export function ServicesPreview() {
                   <Icon paths={sv.paths} size={24} />
                 </span>
                 <h3 style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em", margin: "0 0 10px", color: "var(--fg)" }}>{sv.title}</h3>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: "var(--fg-dim)", margin: "0 0 18px" }}>{sv.desc}</p>
+                <p style={{ fontSize: 16, lineHeight: 1.6, color: "var(--fg-dim)", margin: "0 0 18px" }}>{sv.desc}</p>
                 <Link href="/services" className="learn-link" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13.5, fontWeight: 600, fontFamily: "var(--font-display)" }}>
                   Learn More <ArrowRight size={15} strokeWidth={2.2} />
                 </Link>

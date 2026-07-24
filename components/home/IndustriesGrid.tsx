@@ -32,7 +32,7 @@ export function IndustriesGrid() {
                 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40 }}>
                   <Icon paths={ind.paths} size={32} stroke="#4F8CFF" />
                 </span>
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 14.5, fontWeight: 600, lineHeight: 1.3, color: "var(--fg)" }}>{ind.label}</span>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 600, lineHeight: 1.3, color: "var(--fg)" }}>{ind.label}</span>
               </Link>
             </Reveal>
           ))}

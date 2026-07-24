@@ -29,7 +29,7 @@ export function ProcessTimeline() {
         <div style={{ textAlign: "center", margin: "0 auto clamp(36px,4vw,56px)", maxWidth: 760 }}>
           <Reveal><p style={{ fontFamily: "var(--font-display)", fontSize: 12.5, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#8FA0BC", margin: "0 0 18px" }}>Our AI Development Process</p></Reveal>
           <Reveal delay={60}><h2 style={{ color: "#fff", margin: 0, textWrap: "balance" }}>How We Turn AI Initiatives into Business Impact</h2></Reveal>
-          <Reveal delay={120}><p style={{ fontSize: "clamp(18px,1.4vw,17px)", lineHeight: 1.6, color: "#9FB0CC", margin: "20px auto 0", maxWidth: 640 }}>Our structured six-stage methodology helps organizations move from AI strategy and planning to deployment, adoption, and continuous optimization while delivering measurable business outcomes.</p></Reveal>
+          <Reveal delay={120}><p style={{ fontSize: "clamp(19px,1.4vw,17px)", lineHeight: 1.6, color: "#9FB0CC", margin: "20px auto 0", maxWidth: 640 }}>Our structured six-stage methodology helps organizations move from AI strategy and planning to deployment, adoption, and continuous optimization while delivering measurable business outcomes.</p></Reveal>
         </div>
         <div ref={ref} style={{ position: "relative" }}>
           <svg viewBox="0 0 1160 20" preserveAspectRatio="none" className="tl-line" style={{ position: "absolute", top: 15, left: 0, width: "100%", height: 20, overflow: "visible" }}>
@@ -39,9 +39,9 @@ export function ProcessTimeline() {
           <div className="tl-grid">
             {STEPS.map((ps, i) => (
               <div key={ps.n} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-                <span style={{ width: 34, height: 34, borderRadius: 9999, background: on ? "linear-gradient(135deg, #3B82F6, #2563EB)" : "#10151F", border: `2px solid ${on ? "#3B82F6" : "rgba(255,255,255,0.2)"}`, color: on ? "#fff" : "#8FA0BC", boxShadow: on ? "0 0 18px -2px rgba(59,130,246,0.9)" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, marginBottom: 20, transition: "all .5s", transitionDelay: `${300 + i * 260}ms` }}>{ps.n}</span>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--fg)", marginBottom: 7 }}>{ps.n}. {ps.title}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.5, color: "var(--fg-faint)", maxWidth: 170 }}>{ps.desc}</div>
+                <span style={{ width: 34, height: 34, borderRadius: 9999, background: on ? "linear-gradient(135deg, #3B82F6, #2563EB)" : "#10151F", border: `2px solid ${on ? "#3B82F6" : "rgba(255,255,255,0.2)"}`, color: on ? "#fff" : "#8FA0BC", boxShadow: on ? "0 0 18px -2px rgba(59,130,246,0.9)" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, marginBottom: 20, transition: "all .5s", transitionDelay: `${300 + i * 260}ms` }}>{ps.n}</span>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 600, color: "var(--fg)", marginBottom: 7 }}>{ps.n}. {ps.title}</div>
+                <div style={{ fontSize: 16, lineHeight: 1.5, color: "var(--fg-faint)", maxWidth: 170 }}>{ps.desc}</div>
               </div>
             ))}
           </div>
