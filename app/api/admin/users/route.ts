@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { hashPassword } from "@/lib/password";
+import { guard } from "@/lib/rbac";
 
 export async function GET(req: NextRequest) {
   try {
+    const g = await guard("manage:users");
+    if (!g.ok) return g.res;
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") ?? "";
@@ -36,8 +39,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const g = await guard("manage:users");
+    if (!g.ok) return g.res;
     const body = await req.json();
-    const { name, email, role = "user", avatar, active = true } = body;
+    const { name, email, role = "author", avatar, active = true } = body;
 
     if (!name || !email) {
       return NextResponse.json({ error: "Name and email are required" }, { status: 400 });

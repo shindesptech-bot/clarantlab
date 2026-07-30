@@ -10,8 +10,12 @@ const TestimonialSchema = new Schema<ITestimonial>(
     text: { type: String, required: true },
     image: { type: String },
     visible: { type: Boolean, default: true },
+    // Manual display order — lower first; ties break by newest. See lib/testimonials.ts.
+    order: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
+
+TestimonialSchema.index({ order: 1, createdAt: -1 });
 
 export const Testimonial = models.Testimonial ?? model<ITestimonial>("Testimonial", TestimonialSchema);

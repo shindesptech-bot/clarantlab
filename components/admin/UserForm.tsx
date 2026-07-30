@@ -16,7 +16,7 @@ import type { IAdminUser } from "@/types"
 const schema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email("Invalid email address"),
-  role: z.enum(["admin", "editor", "user"]),
+  role: z.enum(["admin", "editor", "author"]),
   avatar: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
   active: z.boolean(),
   password: z.string().min(6, "Minimum 6 characters").or(z.literal("")).optional(),
@@ -37,7 +37,7 @@ export function UserForm({ initial, id }: UserFormProps) {
     defaultValues: {
       name: initial?.name ?? "",
       email: initial?.email ?? "",
-      role: (initial?.role as "admin" | "editor" | "user") ?? "user",
+      role: (initial?.role as "admin" | "editor" | "author") ?? "author",
       avatar: initial?.avatar ?? "",
       active: initial?.active ?? true,
       password: "",
@@ -115,7 +115,7 @@ export function UserForm({ initial, id }: UserFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="author">Author</SelectItem>
                     <SelectItem value="editor">Editor</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>

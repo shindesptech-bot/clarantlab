@@ -49,7 +49,7 @@ function timeAgo(date: Date | string | undefined): string {
 const roleVariant: Record<string, "default" | "destructive" | "warning" | "secondary"> = {
   admin: "destructive",
   editor: "warning",
-  user: "secondary",
+  author: "secondary",
 };
 
 export default async function AdminDashboardPage() {

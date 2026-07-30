@@ -23,6 +23,7 @@ const schema = z.object({
   text: z.string().min(10, "Testimonial must be at least 10 characters").max(1000),
   image: z.string().optional(),
   visible: z.boolean(),
+  order: z.number().int().min(0),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -45,6 +46,7 @@ export function TestimonialForm({ initial, id }: TestimonialFormProps) {
       text: initial?.text ?? "",
       image: initial?.image ?? "",
       visible: initial?.visible ?? true,
+      order: initial?.order ?? 0,
     },
   })
 
@@ -193,7 +195,32 @@ export function TestimonialForm({ initial, id }: TestimonialFormProps) {
         </Card>
 
         <Card style={{ background: "var(--bg-1)", border: "1px solid var(--line)" }}>
-          <CardContent style={{ paddingTop: 20 }}>
+          <CardContent style={{ paddingTop: 20 }} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="order"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "var(--fg)" }}>Display order</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      style={{ background: "var(--bg-2)", borderColor: "var(--line)", color: "var(--fg)", maxWidth: 140 }}
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  </FormControl>
+                  <p style={{ fontSize: 12, color: "var(--fg-2, #888)", margin: "2px 0 0" }}>
+                    Lower numbers show first. Ties break by newest.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="visible"

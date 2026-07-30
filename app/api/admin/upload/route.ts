@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { guard } from "@/lib/rbac";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,6 +10,8 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
+    const g = await guard("upload:media");
+    if (!g.ok) return g.res;
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
 

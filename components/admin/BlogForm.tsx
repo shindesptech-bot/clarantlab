@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUpload } from "@/components/admin/ImageUpload"
+import { FaqEditor } from "@/components/admin/FaqEditor"
 import type { IBlogPostDoc } from "@/types"
 
 function toSlug(s: string) {
@@ -35,6 +36,11 @@ const schema = z.object({
   seoTitle: z.string().max(70).optional(),
   seoDescription: z.string().max(160).optional(),
   seoKeywords: z.string().optional(),
+  ogImage: z.string().optional(),
+  imageAlt: z.string().optional(),
+  schemaMarkup: z.string().optional(),
+  readMin: z.string().optional(),
+  faq: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -62,6 +68,11 @@ export function BlogForm({ initial, id }: BlogFormProps) {
       seoTitle: initial?.seoTitle ?? "",
       seoDescription: initial?.seoDescription ?? "",
       seoKeywords: initial?.seoKeywords ?? "",
+      ogImage: initial?.ogImage ?? "",
+      imageAlt: initial?.imageAlt ?? "",
+      schemaMarkup: initial?.schemaMarkup ?? "",
+      readMin: initial?.readMin ? String(initial.readMin) : "",
+      faq: initial?.faq ?? [],
     },
   })
 
@@ -69,6 +80,34 @@ export function BlogForm({ initial, id }: BlogFormProps) {
   const isSubmitting = form.formState.isSubmitting
   const slugValue = watch("slug")
   const featuredImage = watch("featuredImage")
+  const ogImage = watch("ogImage")
+  const faq = watch("faq")
+  const tagsValue = watch("tags")
+
+  // Managed taxonomy (Phase 3): suggestions sourced from the Category/Tag
+  // collections. Values are still stored as names on the post, so free-text and
+  // legacy values keep working.
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([])
+  const [tagOptions, setTagOptions] = useState<string[]>([])
+
+  useEffect(() => {
+    let active = true
+    Promise.all([
+      fetch("/api/admin/categories").then((r) => (r.ok ? r.json() : { items: [] })).catch(() => ({ items: [] })),
+      fetch("/api/admin/tags").then((r) => (r.ok ? r.json() : { items: [] })).catch(() => ({ items: [] })),
+    ]).then(([cats, tags]) => {
+      if (!active) return
+      setCategoryOptions((cats.items ?? []).map((c: { name: string }) => c.name))
+      setTagOptions((tags.items ?? []).map((t: { name: string }) => t.name))
+    })
+    return () => { active = false }
+  }, [])
+
+  function toggleTag(name: string) {
+    const current = (tagsValue ? tagsValue.split(",").map((t) => t.trim()).filter(Boolean) : [])
+    const next = current.includes(name) ? current.filter((t) => t !== name) : [...current, name]
+    setValue("tags", next.join(", "))
+  }
 
   const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value
@@ -83,6 +122,8 @@ export function BlogForm({ initial, id }: BlogFormProps) {
       const payload = {
         ...values,
         tags: values.tags ? values.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
+        readMin: values.readMin ? Number(values.readMin) : undefined,
+        faq: values.faq ?? [],
       }
       const res = await fetch(id ? `/api/admin/blog/${id}` : "/api/admin/blog", {
         method: id ? "PUT" : "POST",
@@ -250,6 +291,35 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="schemaMarkup"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel style={{ color: "var(--fg)" }}>JSON-LD Schema <span style={{ color: "var(--fg-2, #888)", fontWeight: 400 }}>(optional, advanced)</span></FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder='{"@context":"https://schema.org", ...}'
+                          rows={4}
+                          style={{ background: "var(--bg-2)", borderColor: "var(--line)", color: "var(--fg)", resize: "vertical", fontFamily: "monospace", fontSize: 12 }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription style={{ color: "var(--fg-2, #888)" }}>Injected into the page &lt;head&gt;. Leave blank for none.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* FAQ */}
+            <Card style={{ background: "var(--bg-1)", border: "1px solid var(--line)" }}>
+              <CardHeader style={{ paddingBottom: 12 }}>
+                <CardTitle style={{ fontSize: 15, color: "var(--fg)" }}>FAQ <span style={{ color: "var(--fg-2, #888)", fontWeight: 400, fontSize: 13 }}>(powers FAQ structured data)</span></CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FaqEditor value={faq ?? []} onChange={(v) => setValue("faq", v)} />
               </CardContent>
             </Card>
           </div>
@@ -299,6 +369,26 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="readMin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel style={{ color: "var(--fg)" }}>Read time <span style={{ color: "var(--fg-2, #888)", fontWeight: 400 }}>(minutes)</span></FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={60}
+                          placeholder="Auto"
+                          style={{ background: "var(--bg-2)", borderColor: "var(--line)", color: "var(--fg)" }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription style={{ color: "var(--fg-2, #888)" }}>Leave blank to estimate from content.</FormDescription>
+                    </FormItem>
+                  )}
+                />
 
                 <Separator style={{ background: "var(--line)" }} />
 
@@ -330,10 +420,14 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                       <FormControl>
                         <Input
                           placeholder="e.g. Technology"
+                          list="blog-category-options"
                           style={{ background: "var(--bg-2)", borderColor: "var(--line)", color: "var(--fg)" }}
                           {...field}
                         />
                       </FormControl>
+                      <datalist id="blog-category-options">
+                        {categoryOptions.map((c) => <option key={c} value={c} />)}
+                      </datalist>
                     </FormItem>
                   )}
                 />
@@ -351,6 +445,31 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                         />
                       </FormControl>
                       <FormDescription style={{ color: "var(--fg-2, #888)" }}>Comma-separated tags</FormDescription>
+                      {tagOptions.length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+                          {tagOptions.map((t) => {
+                            const selected = (tagsValue ?? "").split(",").map((x) => x.trim()).includes(t)
+                            return (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => toggleTag(t)}
+                                style={{
+                                  fontSize: 12,
+                                  padding: "3px 10px",
+                                  borderRadius: 999,
+                                  cursor: "pointer",
+                                  border: "1px solid var(--line)",
+                                  background: selected ? "var(--accent)" : "transparent",
+                                  color: selected ? "#0a0a0a" : "var(--fg)",
+                                }}
+                              >
+                                {t}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -361,12 +480,38 @@ export function BlogForm({ initial, id }: BlogFormProps) {
               <CardHeader style={{ paddingBottom: 12 }}>
                 <CardTitle style={{ fontSize: 15, color: "var(--fg)" }}>Featured Image</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <ImageUpload
                   value={featuredImage}
                   onChange={(url) => setValue("featuredImage", url)}
                   label="Upload Featured Image"
                 />
+                <FormField
+                  control={form.control}
+                  name="imageAlt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel style={{ color: "var(--fg)" }}>Image Alt Text</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Describe the image (SEO + accessibility)"
+                          style={{ background: "var(--bg-2)", borderColor: "var(--line)", color: "var(--fg)" }}
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <div>
+                  <FormLabel style={{ color: "var(--fg)", display: "block", marginBottom: 8 }}>
+                    Open Graph Image <span style={{ color: "var(--fg-2, #888)", fontWeight: 400 }}>(social share)</span>
+                  </FormLabel>
+                  <ImageUpload
+                    value={ogImage}
+                    onChange={(url) => setValue("ogImage", url)}
+                    label="Upload OG Image"
+                  />
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -18,7 +18,7 @@ const PAGE_SIZE = 10
 const roleVariant: Record<string, "default" | "destructive" | "warning" | "secondary"> = {
   admin: "destructive",
   editor: "warning",
-  user: "secondary",
+  author: "secondary",
 }
 
 export default function UsersPage() {
@@ -132,7 +132,7 @@ export default function UsersPage() {
             <SelectItem value="all">All roles</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
             <SelectItem value="editor">Editor</SelectItem>
-            <SelectItem value="user">User</SelectItem>
+            <SelectItem value="author">Author</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" onClick={() => fetchUsers()}

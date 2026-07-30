@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Testimonial } from "@/models/Testimonial";
+import { guard } from "@/lib/rbac";
 
 export async function GET(req: NextRequest) {
   try {
+    const g = await guard("manage:testimonials");
+    if (!g.ok) return g.res;
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") ?? "";
@@ -23,7 +26,7 @@ export async function GET(req: NextRequest) {
     if (visible !== null && visible !== "") filter.visible = visible === "true";
 
     const [testimonials, total] = await Promise.all([
-      Testimonial.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Testimonial.find(filter).sort({ order: 1, createdAt: -1 }).skip(skip).limit(limit).lean(),
       Testimonial.countDocuments(filter),
     ]);
     return NextResponse.json({ testimonials, total, page, limit });
@@ -35,15 +38,17 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const g = await guard("manage:testimonials");
+    if (!g.ok) return g.res;
     const body = await req.json();
-    const { name, role, company, rating, text, image, visible = true } = body;
+    const { name, role, company, rating, text, image, visible = true, order = 0 } = body;
 
     if (!name || !role || !company || !text) {
       return NextResponse.json({ error: "Name, role, company, and text are required" }, { status: 400 });
     }
 
     await connectToDatabase();
-    const testimonial = await Testimonial.create({ name, role, company, rating, text, image, visible });
+    const testimonial = await Testimonial.create({ name, role, company, rating, text, image, visible, order });
     return NextResponse.json({ testimonial }, { status: 201 });
   } catch (err) {
     console.error("[admin/testimonials] POST:", err);

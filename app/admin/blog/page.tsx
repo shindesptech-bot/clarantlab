@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { Search, Edit2, Eye, RefreshCw, Plus, FileText, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Edit2, Eye, RefreshCw, Plus, FileText, ChevronLeft, ChevronRight, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -70,12 +70,20 @@ export default function BlogPage() {
             <p style={{ margin: 0, fontSize: 13, color: "var(--fg-2, #888)" }}>{total} total posts</p>
           </div>
         </div>
-        <Button asChild style={{ background: "var(--accent)", color: "#0a0a0a", fontWeight: 600 }}>
-          <Link href="/admin/blog/new">
-            <Plus size={16} />
-            Write Post
-          </Link>
-        </Button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <Button asChild variant="outline" style={{ borderColor: "var(--line)", color: "var(--fg)", background: "transparent" }}>
+            <Link href="/admin/blog/trash">
+              <Trash2 size={16} />
+              Trash
+            </Link>
+          </Button>
+          <Button asChild style={{ background: "var(--accent)", color: "#0a0a0a", fontWeight: 600 }}>
+            <Link href="/admin/blog/new">
+              <Plus size={16} />
+              Write Post
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

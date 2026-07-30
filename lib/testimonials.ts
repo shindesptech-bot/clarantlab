@@ -15,7 +15,7 @@ export async function getVisibleTestimonials(): Promise<PublicTestimonial[]> {
   try {
     await connectToDatabase();
     const docs = await Testimonial.find({ visible: true })
-      .sort({ createdAt: -1 })
+      .sort({ order: 1, createdAt: -1 })
       .lean<TestimonialDoc[]>();
     return docs.map((d) => ({
       name: d.name,

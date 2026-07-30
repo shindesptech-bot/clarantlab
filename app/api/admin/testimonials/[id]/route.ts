@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Testimonial } from "@/models/Testimonial";
+import { guard } from "@/lib/rbac";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const g = await guard("manage:testimonials");
+    if (!g.ok) return g.res;
     const { id } = await params;
     await connectToDatabase();
     const testimonial = await Testimonial.findById(id).lean();
@@ -17,9 +20,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const g = await guard("manage:testimonials");
+    if (!g.ok) return g.res;
     const { id } = await params;
     const body = await req.json();
-    const { name, role, company, rating, text, image, visible } = body;
+    const { name, role, company, rating, text, image, visible, order } = body;
 
     if (!name || !role || !company || !text) {
       return NextResponse.json({ error: "Name, role, company, and text are required" }, { status: 400 });
@@ -28,7 +33,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectToDatabase();
     const testimonial = await Testimonial.findByIdAndUpdate(
       id,
-      { name, role, company, rating, text, image, visible },
+      { name, role, company, rating, text, image, visible, order },
       { new: true, runValidators: true }
     ).lean();
 
@@ -42,6 +47,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const g = await guard("manage:testimonials");
+    if (!g.ok) return g.res;
     const { id } = await params;
     const body = await req.json();
     await connectToDatabase();
@@ -56,6 +63,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const g = await guard("manage:testimonials");
+    if (!g.ok) return g.res;
     const { id } = await params;
     await connectToDatabase();
     const testimonial = await Testimonial.findByIdAndDelete(id).lean();

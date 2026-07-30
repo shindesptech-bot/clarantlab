@@ -1,14 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Underline from "@tiptap/extension-underline"
 import Link from "@tiptap/extension-link"
 import Image from "@tiptap/extension-image"
 import Placeholder from "@tiptap/extension-placeholder"
+import { html as beautifyHtml } from "js-beautify"
 import {
   Bold, Italic, UnderlineIcon, Strikethrough,
-  List, ListOrdered, Quote, Code,
+  List, ListOrdered, Quote, Code, Code2,
   Heading1, Heading2, Heading3, Undo, Redo, Minus,
 } from "lucide-react"
 
@@ -33,7 +35,21 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     },
   })
 
+  const [source, setSource] = useState(false)
+
   if (!editor) return null
+
+  function toggleSource() {
+    if (!editor) return
+    if (!source) {
+      // Entering source view — pretty-print the current HTML.
+      onChange(beautifyHtml(value || editor.getHTML(), { indent_size: 2, wrap_line_length: 0 }))
+    } else {
+      // Returning to the visual editor — parse the (possibly hand-edited) HTML back in.
+      editor.commands.setContent(value || "")
+    }
+    setSource((s) => !s)
+  }
 
   const ToolbarBtn = ({ onClick, active, title, children }: {
     onClick: () => void; active?: boolean; title: string; children: React.ReactNode
@@ -75,6 +91,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           alignItems: "center",
         }}
       >
+        {!source && (<>
         <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold">
           <Bold size={14} />
         </ToolbarBtn>
@@ -126,14 +143,41 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">
           <Redo size={14} />
         </ToolbarBtn>
+        </>)}
+        <div style={{ marginLeft: "auto" }} />
+        <ToolbarBtn onClick={toggleSource} active={source} title={source ? "Visual editor" : "Edit HTML source"}>
+          <Code2 size={14} />
+        </ToolbarBtn>
       </div>
 
       {/* Editor */}
-      <EditorContent
-        editor={editor}
-        style={{ padding: "12px 16px", minHeight: 300, color: "var(--fg)", fontSize: 14 }}
-        className="prose-editor"
-      />
+      {source ? (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          spellCheck={false}
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            padding: "12px 16px",
+            minHeight: 300,
+            border: "none",
+            outline: "none",
+            resize: "vertical",
+            background: "var(--bg-2, #1a1a1a)",
+            color: "var(--fg)",
+            fontSize: 13,
+            fontFamily: "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+            lineHeight: 1.6,
+          }}
+        />
+      ) : (
+        <EditorContent
+          editor={editor}
+          style={{ padding: "12px 16px", minHeight: 300, color: "var(--fg)", fontSize: 14 }}
+          className="prose-editor"
+        />
+      )}
 
       <style>{`
         .prose-editor .ProseMirror {

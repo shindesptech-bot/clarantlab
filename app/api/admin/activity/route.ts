@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/models/User";
+import { guard } from "@/lib/rbac";
 
 export async function GET() {
   try {
+    const g = await guard("view:analytics");
+    if (!g.ok) return g.res;
     await connectToDatabase();
     const users = await User.find({ lastLoginAt: { $exists: true, $ne: null } })
       .sort({ lastLoginAt: -1 })

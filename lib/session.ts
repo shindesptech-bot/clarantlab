@@ -1,11 +1,18 @@
 import { createHmac } from "crypto";
 
+if (process.env.NODE_ENV === "production" && !process.env.AUTH_SECRET) {
+  throw new Error("AUTH_SECRET must be set in production");
+}
 const SECRET = process.env.AUTH_SECRET ?? "fallback-secret";
 
 export interface SessionPayload {
   id: string;
   email: string;
   role: string;
+  // Signed into the token so route guards can reject a deactivated account
+  // without a DB round-trip. Older tokens without it read as undefined (treated
+  // as active until they expire).
+  active?: boolean;
   exp: number;
 }
 

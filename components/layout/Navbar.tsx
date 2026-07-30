@@ -52,7 +52,7 @@ export function Navbar() {
                 className="nav-link"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: 13.5,
+                  fontSize: 15,
                   fontWeight: 500,
                   color: isActive(link.href) ? "var(--fg)" : "var(--fg-dim)",
                   transition: "color 0.18s",

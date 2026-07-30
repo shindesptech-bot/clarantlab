@@ -34,6 +34,13 @@ interface BlogDoc {
   author: string;
   featuredImage?: string;
   createdAt?: Date | string;
+  readMin?: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: string;
+  imageAlt?: string;
+  schemaMarkup?: string;
+  faq?: { q: string; a: string }[];
 }
 
 function toPublic(doc: BlogDoc): PublicPost {
@@ -46,9 +53,15 @@ function toPublic(doc: BlogDoc): PublicPost {
     author: doc.author,
     authorInitials: initials(doc.author),
     date: formatDate(doc.createdAt),
-    readTime: readingTime(doc.content),
+    readTime: doc.readMin ? `${doc.readMin} min` : readingTime(doc.content),
     contentHtml: doc.content,
     featuredImage: doc.featuredImage || "",
+    seoTitle: doc.seoTitle,
+    seoDescription: doc.seoDescription,
+    ogImage: doc.ogImage,
+    imageAlt: doc.imageAlt,
+    schemaMarkup: doc.schemaMarkup,
+    faq: doc.faq && doc.faq.length ? doc.faq : undefined,
   };
 }
 
@@ -57,7 +70,7 @@ function toPublic(doc: BlogDoc): PublicPost {
 export async function getPublishedPosts(): Promise<PublicPost[]> {
   try {
     const conn = await connectToDatabase();
-    const docs = await BlogPost.find({ status: "published" })
+    const docs = await BlogPost.find({ status: "published", deletedAt: null })
       .sort({ createdAt: -1 })
       .lean<BlogDoc[]>();
     // TEMP diagnostic — visible in Vercel function logs.
@@ -72,7 +85,7 @@ export async function getPublishedPosts(): Promise<PublicPost[]> {
 export async function getPublishedPostBySlug(slug: string): Promise<PublicPost | null> {
   try {
     await connectToDatabase();
-    const doc = await BlogPost.findOne({ slug, status: "published" }).lean<BlogDoc | null>();
+    const doc = await BlogPost.findOne({ slug, status: "published", deletedAt: null }).lean<BlogDoc | null>();
     return doc ? toPublic(doc) : null;
   } catch (err) {
     console.error("[blog] getPublishedPostBySlug failed:", err);
@@ -83,7 +96,7 @@ export async function getPublishedPostBySlug(slug: string): Promise<PublicPost |
 export async function getRelatedPosts(slug: string, limit = 3): Promise<PublicPost[]> {
   try {
     await connectToDatabase();
-    const docs = await BlogPost.find({ status: "published", slug: { $ne: slug } })
+    const docs = await BlogPost.find({ status: "published", slug: { $ne: slug }, deletedAt: null })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean<BlogDoc[]>();

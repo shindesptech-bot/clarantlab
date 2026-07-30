@@ -56,6 +56,20 @@ export default function TestimonialsPage() {
     }
   }
 
+  async function updateOrder(id: string, order: number) {
+    try {
+      await fetch(`/api/admin/testimonials/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order }),
+      })
+      toast.success("Order updated")
+      fetchItems()
+    } catch {
+      toast.error("Failed to update order")
+    }
+  }
+
   async function toggleVisible(t: ITestimonial) {
     try {
       await fetch(`/api/admin/testimonials/${t._id}`, {
@@ -129,6 +143,7 @@ export default function TestimonialsPage() {
           <Table>
             <TableHeader>
               <TableRow style={{ borderBottom: "1px solid var(--line)" }}>
+                <TableHead style={{ color: "var(--fg-2, #888)", width: 70 }}>Order</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Person</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Company</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Rating</TableHead>
@@ -140,12 +155,24 @@ export default function TestimonialsPage() {
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} style={{ textAlign: "center", padding: 48, color: "var(--fg-2, #888)" }}>
+                  <TableCell colSpan={7} style={{ textAlign: "center", padding: 48, color: "var(--fg-2, #888)" }}>
                     No testimonials found.
                   </TableCell>
                 </TableRow>
               ) : items.map((t) => (
                 <TableRow key={t._id} style={{ borderBottom: "1px solid var(--line)" }}>
+                  <TableCell style={{ width: 70 }}>
+                    <Input
+                      type="number"
+                      min={0}
+                      defaultValue={t.order ?? 0}
+                      onBlur={(e) => {
+                        const v = Number(e.target.value)
+                        if (!Number.isNaN(v) && v !== (t.order ?? 0)) updateOrder(t._id!, v)
+                      }}
+                      style={{ width: 56, background: "var(--bg-2)", borderColor: "var(--line)", color: "var(--fg)", padding: "4px 6px", fontSize: 13 }}
+                    />
+                  </TableCell>
                   <TableCell>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <Avatar style={{ width: 36, height: 36 }}>

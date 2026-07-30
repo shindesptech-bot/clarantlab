@@ -1,19 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { BlogPost } from "@/models/Blog";
+import { guard } from "@/lib/rbac";
+import { sanitizeHtml } from "@/lib/content-html";
+import { cleanFaq } from "@/lib/blog-helpers";
 
 export async function GET(req: NextRequest) {
   try {
+    const g = await guard("manage:blogs");
+    if (!g.ok) return g.res;
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") ?? "";
     const status = searchParams.get("status") ?? "";
+    const trash = searchParams.get("trash") === "1";
 
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(100, parseInt(searchParams.get("limit") ?? "10", 10));
     const skip = (page - 1) * limit;
 
-    const filter: Record<string, unknown> = {};
+    // {deletedAt: null} matches both null and missing (legacy) docs.
+    const filter: Record<string, unknown> = trash ? { deletedAt: { $ne: null } } : { deletedAt: null };
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -35,11 +42,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const g = await guard("manage:blogs");
+    if (!g.ok) return g.res;
     const body = await req.json();
     const {
       title, slug, excerpt, content, featuredImage,
       status = "draft", author, tags = [], category,
       seoTitle, seoDescription, seoKeywords,
+      ogImage, imageAlt, schemaMarkup, faq, readMin,
     } = body;
 
     if (!title || !slug || !excerpt || !content || !author) {
@@ -48,9 +58,15 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
     const post = await BlogPost.create({
-      title, slug, excerpt, content, featuredImage,
+      title, slug, excerpt,
+      content: sanitizeHtml(content),
+      featuredImage,
       status, author, tags, category,
       seoTitle, seoDescription, seoKeywords,
+      ogImage, imageAlt, schemaMarkup,
+      faq: cleanFaq(faq),
+      readMin: readMin || undefined,
+      publishedAt: status === "published" ? new Date() : undefined,
     });
     return NextResponse.json({ post }, { status: 201 });
   } catch (err: unknown) {
