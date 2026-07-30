@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPublishedPostBySlug, getRelatedPosts } from "@/lib/blog";
+import { getPublishedPostBySlug, getRelatedPosts, getPublishedPosts } from "@/lib/blog";
 import { ArticlePage } from "@/components/blog/ArticlePage";
 
 export const dynamic = "force-dynamic";
@@ -60,12 +60,18 @@ export default async function ArticlePageRoute({ params }: Props) {
   const related = await getRelatedPosts(slug, 3);
   const jsonLd = buildJsonLd(post);
 
+  // Previous / next navigation across published posts (newest-first order).
+  const all = await getPublishedPosts();
+  const idx = all.findIndex((p) => p.slug === slug);
+  const prev = idx > 0 ? { slug: all[idx - 1].slug, title: all[idx - 1].title } : null;
+  const next = idx >= 0 && idx < all.length - 1 ? { slug: all[idx + 1].slug, title: all[idx + 1].title } : null;
+
   return (
     <>
       {jsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       )}
-      <ArticlePage post={post} related={related} />
+      <ArticlePage post={post} related={related} prev={prev} next={next} />
     </>
   );
 }

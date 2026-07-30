@@ -78,8 +78,8 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   )
 
   return (
-    <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflow: "hidden" }}>
-      {/* Toolbar */}
+    <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflow: "hidden", display: "flex", flexDirection: "column", maxHeight: "70vh" }}>
+      {/* Toolbar — stays pinned to the top while the editor body scrolls */}
       <div
         style={{
           display: "flex",
@@ -89,6 +89,10 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           borderBottom: "1px solid var(--line)",
           background: "var(--bg-1)",
           alignItems: "center",
+          position: "sticky",
+          top: 0,
+          zIndex: 2,
+          flexShrink: 0,
         }}
       >
         {!source && (<>
@@ -150,34 +154,36 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         </ToolbarBtn>
       </div>
 
-      {/* Editor */}
-      {source ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          spellCheck={false}
-          style={{
-            width: "100%",
-            boxSizing: "border-box",
-            padding: "12px 16px",
-            minHeight: 300,
-            border: "none",
-            outline: "none",
-            resize: "vertical",
-            background: "var(--bg-2, #1a1a1a)",
-            color: "var(--fg)",
-            fontSize: 13,
-            fontFamily: "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-            lineHeight: 1.6,
-          }}
-        />
-      ) : (
-        <EditorContent
-          editor={editor}
-          style={{ padding: "12px 16px", minHeight: 300, color: "var(--fg)", fontSize: 14 }}
-          className="prose-editor"
-        />
-      )}
+      {/* Editor body — the only scrolling region, so the toolbar stays visible */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+        {source ? (
+          <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            spellCheck={false}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "12px 16px",
+              minHeight: 300,
+              border: "none",
+              outline: "none",
+              resize: "vertical",
+              background: "var(--bg-2, #1a1a1a)",
+              color: "var(--fg)",
+              fontSize: 13,
+              fontFamily: "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+              lineHeight: 1.6,
+            }}
+          />
+        ) : (
+          <EditorContent
+            editor={editor}
+            style={{ padding: "12px 16px", minHeight: 300, color: "var(--fg)", fontSize: 14 }}
+            className="prose-editor"
+          />
+        )}
+      </div>
 
       <style>{`
         .prose-editor .ProseMirror {
