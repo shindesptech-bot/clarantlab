@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, Sun, Moon, ArrowRight, ChevronDown } from "lucide-react";
-import { useTheme } from "@/components/layout/ThemeProvider";
+import { Menu, X, ArrowRight, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "@/constants/nav";
 import type { NavLink } from "@/types";
 
@@ -12,7 +11,6 @@ export function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileSub, setMobileSub] = useState<string | null>(null);
-  const { theme, setTheme } = useTheme();
 
   const isActive = (href: string) => {
     if (href.startsWith("/#")) return pathname === "/";
@@ -74,25 +72,6 @@ export function Navbar() {
 
           {/* Right cluster */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {/* Theme toggle */}
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              style={{
-                background: "transparent",
-                border: "1px solid var(--line-strong)",
-                borderRadius: 8,
-                color: "var(--fg-dim)",
-                padding: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.18s",
-              }}
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
-            </button>
-
             {/* Energy CTA */}
             <Link href="/contact" className="energy-btn nav-cta" aria-label="Book a Free Consultation">
               <span className="energy-shimmer" />

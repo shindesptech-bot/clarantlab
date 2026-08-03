@@ -55,7 +55,7 @@ export function HeroSection() {
       {/* Dark overlay for legibility — near-solid on the left where the copy sits, fading right to keep the video visible */}
       <div aria-hidden style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, rgba(3,6,16,0.95) 0%, rgba(3,6,16,0.88) 38%, rgba(4,8,20,0.6) 70%, rgba(4,8,20,0.4) 100%)" }} />
 
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 1440, margin: "0 auto", padding: "clamp(44px,5vw,72px) clamp(28px,4vw,60px) clamp(28px,3vw,52px)" }}>
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 1440, margin: "0 auto", padding: "clamp(20px,2.5vw,36px) clamp(28px,4vw,60px) clamp(28px,3vw,52px)" }}>
         {/* Foreground text sits on the dark video in both themes — force light tones + shadow for separation */}
         <div style={{ minWidth: 0, color: "#fff", textShadow: "0 1px 24px rgba(0,0,0,0.55)" }}>
           <div style={{ maxWidth: 720 }}>

@@ -658,8 +658,13 @@
 }
 /* When a real cover image exists, let the container take the image's natural
    aspect ratio — no 16/9 box to crop into, no letterboxing. */
+/* With a real image, the container takes the image's own aspect ratio (no fixed
+   height, no cropping box) so the COMPLETE image is always visible — no top/bottom
+   crop, no side clipping, no letterbox bars. Height scales responsively with the
+   container width. */
 .post2-cover.has-img {
   aspect-ratio: auto;
+  height: auto;
   background: var(--bg);
 }
 .post2-cover .ph {
@@ -1323,7 +1328,9 @@
 /* Cover image — fills the .post2-cover container */
 .post2-cover-img {
   width: 100%;        /* fluid — fills the container width responsively */
-  height: auto;       /* preserves the image's native aspect ratio: no crop, stretch or distortion */
+  height: auto;       /* natural aspect ratio: whole image visible, no crop/stretch/distortion */
+  object-fit: contain;
+  object-position: center;
   display: block;
   border-radius: inherit;
 }

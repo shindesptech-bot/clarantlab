@@ -53,30 +53,6 @@
   --radius-lg: 18px;
 }
 
-/* ─── Light mode overrides ────────────────────────────────────────────────── */
-[data-theme="light"] {
-  --bg-0: #ffffff;
-  --bg-hero: #f6f8fc;
-  --bg-services: #f1f5fb;
-  --bg-industries: #eef3fb;
-  --bg-footer: #eef2f9;
-  --bg-1: #f6f8fc;
-  --bg-2: #eef2f9;
-  --bg-3: #e4eaf5;
-
-  --line: rgba(11, 15, 25, 0.09);
-  --line-strong: rgba(11, 15, 25, 0.16);
-
-  --fg: #0b0f19;
-  --fg-dim: #4a5468;
-  --fg-soft: #3a4356;
-  --fg-faint: #8791a3;
-  --fg-faintest: #98a2b4;
-
-  /* Space Grotesk for body copy in light mode (per locked spec) */
-  --font-body: var(--font-display);
-}
-
 /* ─── Reset ───────────────────────────────────────────────────────────────── */
 *,
 *::before,
@@ -370,31 +346,4 @@ p {
   --sidebar-ring: 217 91% 60%;
 }
 
-[data-theme="light"] {
-  --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 217 91% 55%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 217 91% 55%;
-  --sidebar-background: 0 0% 98%;
-  --sidebar-foreground: 240 5% 26%;
-  --sidebar-primary: 217 91% 55%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 5% 96%;
-  --sidebar-accent-foreground: 240 6% 10%;
-  --sidebar-border: 220 13% 91%;
-  --sidebar-ring: 217 91% 55%;
-}
 

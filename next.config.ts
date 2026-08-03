@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Industries is served from the existing /use-cases pages — keep the URL as
+  // /industries without moving files. ponytail: rewrite, rename the folder if
+  // /use-cases must stop resolving.
+  async rewrites() {
+    return [{ source: "/industries/:path*", destination: "/use-cases/:path*" }];
+  },
+
   // Allow Cloudinary images
   images: {
     // Next 16 defaults qualities to [75]; allow 90 for the high-detail hero visual.
