@@ -3,8 +3,8 @@ import { Mail, Phone, MapPin } from "lucide-react";
 
 const COMPANY = [
   { label: "About", href: "/#why" },
-  { label: "Services", href: "/services" },
-  { label: "Industries", href: "/industries" },
+ 
+
   { label: "Work", href: "/work" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
@@ -14,17 +14,17 @@ const COMPANY = [
 // AI Integration going to its dedicated page. ponytail: point to real routes,
 // split out when each service gets its own page.
 const SERVICES = [
-  { label: "AI Consulting", href: "/services" },
-  { label: "AI Development", href: "/services" },
+  { label: "Mcp Implementation", href: "/services" },
+  { label: "Rag Implementation", href: "/services" },
   { label: "AI Integration", href: "/services/ai-integration-services" },
-  { label: "AI Automation", href: "/services" },
-  { label: "AI Agents", href: "/services" },
+
+  { label: "AI Development", href: "/services" },
   { label: "Enterprise AI Solutions", href: "/services" },
 ];
 
 const CONTACT = [
   { icon: Mail, label: "hello@buildwithgenie.com", href: "mailto:hello@buildwithgenie.com" },
-  { icon: Phone, label: "+1 617 555 0118", href: "tel:+16175550118" },
+  { icon: Phone, label: "+1 240 281 0320", href: "tel:+16175550118" },
   { icon: MapPin, label: "Boston · Lisbon · Bengaluru", href: null },
 ];
 

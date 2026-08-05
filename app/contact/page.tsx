@@ -18,7 +18,7 @@ const DIRECT = [
   { label: "email", value: "hello@buildwithgenie.com", href: "mailto:hello@buildwithgenie.com" },
   { label: "sales", value: "work@buildwithgenie.com", href: "mailto:work@buildwithgenie.com" },
   { label: "security", value: "security@buildwithgenie.com", href: "mailto:security@buildwithgenie.com" },
-  { label: "signal", value: "+1 617 555 0118", href: null },
+  { label: "signal", value: "+1 240 281 0320", href: null },
 ];
 
 const HOURS = [

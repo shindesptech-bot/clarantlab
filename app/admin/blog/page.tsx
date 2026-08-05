@@ -47,11 +47,18 @@ export default function BlogPage() {
 
   async function handleDelete(id: string, title: string) {
     try {
-      await fetch(`/api/admin/blog/${id}`, { method: "DELETE" })
-      toast.success(`"${title}" deleted`)
-      fetchPosts()
-    } catch {
-      toast.error("Failed to delete post")
+      const res = await fetch(`/api/admin/blog/${id}`, { method: "DELETE" })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Delete failed (${res.status})`)
+      }
+      toast.success(`"${title}" moved to Trash`)
+      // If the last row on a page past the first was removed, step back a page;
+      // otherwise the list would render empty until the user navigates.
+      if (posts.length === 1 && page > 1) setPage((p) => p - 1)
+      else fetchPosts()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete post")
     }
   }
 

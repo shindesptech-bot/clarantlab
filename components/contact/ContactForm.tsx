@@ -7,7 +7,7 @@ const FIELDS = [
   { key: "name" as const, label: "Full name", placeholder: "Jane Park", required: true, type: "text" },
   { key: "email" as const, label: "Work email", placeholder: "jane@yourcompany.com", required: true, type: "email" },
   { key: "company" as const, label: "Company name", placeholder: "Acme Co", required: true, type: "text" },
-  { key: "phone" as const, label: "Phone number (optional)", placeholder: "+1 617 555 0118", required: false, type: "tel" },
+  { key: "phone" as const, label: "Phone number (optional)", placeholder: "+1 240 281 0320", required: false, type: "tel" },
 ];
 
 const inputStyle: React.CSSProperties = {
