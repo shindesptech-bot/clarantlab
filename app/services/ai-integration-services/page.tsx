@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/home/Reveal";
 import { FaqCards } from "@/components/services/FaqCards";
@@ -229,12 +230,13 @@ export default function AiIntegrationServicesPage() {
           {/* Right: integration illustration */}
           <Reveal delay={120}>
             <div style={{ position: "relative", borderRadius: 24, border: "1px solid var(--line)", overflow: "hidden", boxShadow: "0 40px 90px -55px rgba(37,99,235,0.9)" }}>
-              <img
+              <Image
                 src="/assets/ai-integration-systems.png"
                 alt="AI connected to CRM, Sales, Customer Service, HR, Marketing, Data & Analytics, Operations, and Finance systems"
                 width={1536}
                 height={1024}
                 loading="lazy"
+                sizes="(max-width: 900px) 100vw, 50vw"
                 style={{ display: "block", width: "100%", height: "auto" }}
               />
             </div>

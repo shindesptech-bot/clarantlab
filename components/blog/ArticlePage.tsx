@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AUTHOR_BIOS } from "@/constants/blog";
 import { CtaStrip } from "@/components/ui/CtaStrip";
+import { cldOptimize } from "@/lib/cld";
 import type { PublicPost } from "@/types";
 import "./article.css";
 
@@ -35,16 +36,6 @@ function processContent(content: string): { html: string; toc: TocItem[] } {
     }
   );
   return { html, toc };
-}
-
-// Optimize Cloudinary delivery URLs (f_auto,q_auto,w_,c_limit); pass others
-// through unchanged. Idempotent.
-function cldOptimize(url: string | undefined, width?: number): string {
-  if (!url) return "";
-  if (!url.includes("res.cloudinary.com/") || !url.includes("/upload/")) return url;
-  if (/\/upload\/[^/]*(f_auto|q_auto)/.test(url)) return url;
-  const t = ["f_auto", "q_auto", ...(width ? [`w_${width}`, "c_limit"] : [])].join(",");
-  return url.replace("/upload/", `/upload/${t}/`);
 }
 
 interface AdjacentPost {

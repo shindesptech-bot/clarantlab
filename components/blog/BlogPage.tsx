@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CATEGORIES, CAT_HUE } from "@/constants/blog";
+import { cldOptimize } from "@/lib/cld";
 import type { PublicPost } from "@/types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -64,7 +65,7 @@ function FeaturedCard({ post }: { post: PublicPost }) {
         <div style={{ flex: "1 1 340px", position: "relative", minHeight: 320, background: "var(--bg-2)", borderLeft: "1px solid var(--line)" }}>
           {post.featuredImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={post.featuredImage} alt={post.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={cldOptimize(post.featuredImage, 1200)} alt={post.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <div style={cardImg(hue)} />
           )}
@@ -90,7 +91,7 @@ function PostCard({ post }: { post: PublicPost }) {
       <div style={{ position: "relative", height: 172, background: "var(--bg-2)", overflow: "hidden" }}>
         {post.featuredImage ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={post.featuredImage} alt={post.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={cldOptimize(post.featuredImage, 600)} alt={post.title} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
         ) : (
           <div style={cardImg(hue)} />
         )}

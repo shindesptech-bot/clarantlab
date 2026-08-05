@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEARCH_INDEXING_ENABLED } from "@/lib/seo";
+
+// Self-hosted (was a render-blocking @import from fonts.googleapis.com in globals.css).
+// Variable fonts → all weights 400–700 covered; swap matches the prior &display=swap.
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], display: "swap", variable: "--f-space-grotesk" });
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--f-inter" });
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <Navbar />
         <main style={{ flex: 1 }}>{children}</main>
