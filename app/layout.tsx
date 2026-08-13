@@ -3,7 +3,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { SEARCH_INDEXING_ENABLED } from "@/lib/seo";
+import { SEARCH_INDEXING_ENABLED, SITE_URL } from "@/lib/seo";
 
 // Self-hosted (was a render-blocking @import from fonts.googleapis.com in globals.css).
 // Variable fonts → all weights 400–700 covered; swap matches the prior &display=swap.
@@ -11,6 +11,8 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], display: "swap", variab
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--f-inter" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: {
     default: "Build with Genie — Ship faster with AI",
     template: "%s — Build with Genie",
@@ -50,6 +52,31 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#organization`,
+                  name: "Build with Genie",
+                  url: SITE_URL,
+                  description:
+                    "Enterprise AI consulting and development — custom AI solutions, automation, and intelligent systems.",
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": `${SITE_URL}/#website`,
+                  url: SITE_URL,
+                  name: "Build with Genie",
+                  publisher: { "@id": `${SITE_URL}/#organization` },
+                },
+              ],
+            }),
+          }}
+        />
         <Navbar />
         <main style={{ flex: 1 }}>{children}</main>
         <Footer />

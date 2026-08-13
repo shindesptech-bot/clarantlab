@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { BlogPost } from "@/models/Blog";
 import { guard } from "@/lib/rbac";
 import { sanitizeHtml } from "@/lib/content-html";
-import { cleanFaq } from "@/lib/blog-helpers";
+import { cleanFaq, resolveSchedule } from "@/lib/blog-helpers";
 
 export async function GET(req: NextRequest) {
   try {
@@ -50,11 +50,15 @@ export async function POST(req: NextRequest) {
       status = "draft", author, tags = [], category,
       seoTitle, seoDescription, seoKeywords,
       ogImage, imageAlt, schemaMarkup, faq, readMin,
+      scheduledAt, scheduledTimezone,
     } = body;
 
     if (!title || !slug || !excerpt || !content || !author) {
       return NextResponse.json({ error: "Title, slug, excerpt, content, and author are required" }, { status: 400 });
     }
+
+    const sched = resolveSchedule(status, scheduledAt);
+    if ("error" in sched) return NextResponse.json({ error: sched.error }, { status: 400 });
 
     await connectToDatabase();
     const post = await BlogPost.create({
@@ -66,6 +70,8 @@ export async function POST(req: NextRequest) {
       ogImage, imageAlt, schemaMarkup,
       faq: cleanFaq(faq),
       readMin: readMin || undefined,
+      scheduledAt: sched.scheduledAt,
+      scheduledTimezone: status === "scheduled" ? scheduledTimezone : undefined,
       publishedAt: status === "published" ? new Date() : undefined,
     });
     return NextResponse.json({ post }, { status: 201 });

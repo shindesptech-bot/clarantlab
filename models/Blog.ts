@@ -8,7 +8,11 @@ const BlogSchema = new Schema<IBlogPostDoc>(
     excerpt: { type: String, required: true },
     content: { type: String, required: true },
     featuredImage: { type: String },
-    status: { type: String, enum: ["draft", "published"], default: "draft" },
+    status: { type: String, enum: ["draft", "scheduled", "published"], default: "draft" },
+    // Scheduled auto-publish: absolute UTC instant + the IANA zone the admin
+    // picked (kept only so the editor/dashboard can redisplay in that zone).
+    scheduledAt: { type: Date, default: null },
+    scheduledTimezone: { type: String },
     author: { type: String, required: true },
     tags: [{ type: String, trim: true }],
     category: { type: String, trim: true },
@@ -36,5 +40,7 @@ const BlogSchema = new Schema<IBlogPostDoc>(
 // blog GET), not via a global pre-find hook — avoids the classic footgun of the
 // hook silently catching the by-id lookups that edit/restore/permanent-delete need.
 BlogSchema.index({ deletedAt: 1 });
+// Drives the cron publisher's due-posts query.
+BlogSchema.index({ status: 1, scheduledAt: 1 });
 
 export const BlogPost = models.BlogPost ?? model<IBlogPostDoc>("BlogPost", BlogSchema);

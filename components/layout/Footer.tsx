@@ -16,7 +16,7 @@ const COMPANY = [
 const SERVICES = [
   { label: "Mcp Implementation", href: "/services" },
   { label: "Rag Implementation", href: "/services" },
-  { label: "AI Integration", href: "/services/ai-integration-services" },
+  { label: "AI Integration", href: "/services/ai-integration" },
 
   { label: "AI Development", href: "/services" },
   { label: "Enterprise AI Solutions", href: "/services" },

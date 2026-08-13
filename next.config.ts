@@ -25,8 +25,22 @@ const nextConfig: NextConfig = {
     return [{ source: "/industries/:path*", destination: "/use-cases/:path*" }];
   },
 
+  // Permanent (301) redirect from the old service URL to the shortened one.
+  async redirects() {
+    return [
+      {
+        source: "/services/ai-integration-services",
+        destination: "/services/ai-integration",
+        // 301 (not the `permanent: true` 308) — matches the requested status.
+        statusCode: 301,
+      },
+    ];
+  },
+
   // Allow Cloudinary images
   images: {
+    // Serve modern formats — AVIF first (smallest), WebP fallback.
+    formats: ["image/avif", "image/webp"],
     // Next 16 defaults qualities to [75]; allow 90 for the high-detail hero visual.
     qualities: [75, 90],
     remotePatterns: [
@@ -35,6 +49,12 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
+  },
+
+  // simple-icons exports thousands of named icons — tree-shake to the few used.
+  // (lucide-react is already optimized by Next's defaults.)
+  experimental: {
+    optimizePackageImports: ["simple-icons"],
   },
 
   // Strict mode for better error detection during development

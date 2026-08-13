@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "AI Integration Services | Custom Enterprise AI Solutions",
   description:
     "Connect AI with your existing business systems using custom AI integration services. Automate workflows, improve productivity, and scale with enterprise AI solutions.",
+  alternates: { canonical: "/services/ai-integration" },
 };
 
 /* ── Inline stroke-icon (supports circle/rect/path markup like the design) ── */

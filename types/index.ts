@@ -319,7 +319,7 @@ export interface ITestimonial {
 
 // ─── Admin — Blog Post ────────────────────────────────────────────────────────
 
-export type BlogPostStatus = "draft" | "published";
+export type BlogPostStatus = "draft" | "scheduled" | "published";
 
 export interface IBlogFaqItem {
   q: string;
@@ -345,6 +345,8 @@ export interface IBlogPostDoc {
   schemaMarkup?: string;
   faq?: IBlogFaqItem[];
   readMin?: number;
+  scheduledAt?: Date | string | null;
+  scheduledTimezone?: string;
   publishedAt?: Date | string;
   deletedAt?: Date | string | null;
   createdAt?: Date;

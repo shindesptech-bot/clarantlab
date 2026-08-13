@@ -13,3 +13,10 @@
 // Nothing else needs to be touched — robots.ts, the root layout metadata,
 // and the next.config headers all read from here.
 export const SEARCH_INDEXING_ENABLED = false;
+
+// Canonical production origin — drives metadataBase, canonical URLs, OG tags and
+// the sitemap. Override per-environment with NEXT_PUBLIC_SITE_URL; falls back to
+// the brand domain. No trailing slash.
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://buildwithgenie.com"
+).replace(/\/$/, "");

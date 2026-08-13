@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 const HERO_H1 = "Build Enterprise AI Solutions with Expert Consulting & Development";
+const HERO_POSTER = "/assets/hero-ai-core.webp";
 
 const FEATURES = [
   { label: "Enterprise Security", paths: ["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", "m9 12 2 2 4-4"] },
@@ -39,6 +40,9 @@ export function HeroSection() {
 
   return (
     <section style={{ position: "relative", background: "var(--bg-hero)", overflow: "hidden", isolation: "isolate" }}>
+      {/* LCP element is the full-bleed video poster — preload at high priority so it
+          paints before the (unpreloaded) 4.6MB video. React 19 hoists this to <head>. */}
+      <link rel="preload" as="image" href={HERO_POSTER} fetchPriority="high" />
       {/* Full-bleed background video */}
       <video
         autoPlay
@@ -46,7 +50,7 @@ export function HeroSection() {
         loop
         playsInline
         preload="metadata"
-        poster="/assets/hero-ai-core.png"
+        poster={HERO_POSTER}
         aria-label="AI Command Center — the AI CORE connecting CRM, Documents, ERP, AI Agents, Analytics, and Automation"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", zIndex: 0 }}
       >

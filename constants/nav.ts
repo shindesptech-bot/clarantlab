@@ -5,7 +5,7 @@ export const NAV_LINKS: NavLink[] = [
     label: "Services",
     href: "/services",
     children: [
-      { label: "AI Integration Services", href: "/services/ai-integration-services" },
+      { label: "AI Integration Services", href: "/services/ai-integration" },
       { label: "MCP Implementation", href: "/services/mcp-implementation" },
       { label: "RAG Implementation", href: "/services/rag-implementation" },
     ],
