@@ -17,22 +17,15 @@ const PROBLEMS = [
   { label: "Accelerate Digital Transformation", paths: ["M5 12h14", "m12 5 7 7-7 7"] },
 ];
 
-const INDUSTRY_NAMES = ["Healthcare", "Financial Services", "Manufacturing", "Retail", "Insurance", "Real Estate", "Legal", "Logistics", "Technology", "Professional Services"];
-
 const inputStyle: React.CSSProperties = {
   width: "100%", height: 48, padding: "0 14px", fontSize: 14, fontFamily: "inherit",
   color: "var(--fg)", background: "rgba(255,255,255,0.03)", border: "1px solid var(--line-strong)",
   borderRadius: 10, outline: "none", transition: "border-color 0.2s, box-shadow 0.2s",
 };
-const selectStyle: React.CSSProperties = {
-  ...inputStyle, appearance: "none", WebkitAppearance: "none", cursor: "pointer", paddingRight: 40,
-  backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237E8AA0' stroke-width='2'><path d='m6 9 6 6 6-6'/></svg>\")",
-  backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center",
-};
 const textareaStyle: React.CSSProperties = { ...inputStyle, height: "auto", minHeight: 104, padding: "12px 14px", lineHeight: 1.5, resize: "vertical" };
 
-type Form = { name: string; email: string; company: string; phone: string; industry: string; message: string };
-const EMPTY: Form = { name: "", email: "", company: "", phone: "", industry: "", message: "" };
+type Form = { name: string; email: string; company: string; phone: string; message: string };
+const EMPTY: Form = { name: "", email: "", company: "", phone: "", message: "" };
 
 export function BookingSection() {
   const [data, setData] = useState<Form>(EMPTY);
@@ -65,7 +58,7 @@ export function BookingSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.name.trim(), email: data.email.trim(), company: data.company.trim(),
-          phone: data.phone.trim(), industry: data.industry, message: data.message.trim(),
+          phone: data.phone.trim(), message: data.message.trim(),
         }),
       });
       if (!res.ok) {
@@ -120,12 +113,8 @@ export function BookingSection() {
                   <input type="text" value={data.name} onChange={(e) => set("name", e.target.value)} placeholder="Full Name*" style={inputStyle} aria-label="Full name" />
                   <input type="email" value={data.email} onChange={(e) => set("email", e.target.value)} placeholder="Work Email*" style={inputStyle} aria-label="Work email" />
                   <input type="text" value={data.company} onChange={(e) => set("company", e.target.value)} placeholder="Company Name*" style={inputStyle} aria-label="Company name" />
-                  <input type="tel" value={data.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone Number*" style={inputStyle} aria-label="Phone number" />
+                  <input type="tel" value={data.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone Number" style={inputStyle} aria-label="Phone number" />
                 </div>
-                <select value={data.industry} onChange={(e) => set("industry", e.target.value)} style={selectStyle} aria-label="Industry">
-                  <option value="">Industry*</option>
-                  {INDUSTRY_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
-                </select>
                 <textarea rows={4} value={data.message} onChange={(e) => set("message", e.target.value)} placeholder="Tell us about your business challenges*" style={textareaStyle} aria-label="Message" />
                 {formError && <div style={{ fontSize: 16, color: "#F87171" }}>{formError}</div>}
                 <button type="submit" disabled={submitting} className="energy-btn energy-btn-full" style={{ marginTop: 4, opacity: submitting ? 0.7 : 1 }}>
