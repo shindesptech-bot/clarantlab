@@ -113,7 +113,7 @@ export const USE_CASES: UseCase[] = [
       "Product managers don't lack signal — they're drowning in it. Tickets, sales calls, reviews, Slack threads. The genie reads all of it, finds the patterns, and turns them into specs and a ranked roadmap you can defend.",
     intro: [
       "The hardest part of product isn't deciding what to build — it's reading everything first. Customer feedback arrives in a dozen formats across a dozen tools, and the synthesis work that turns it into a decision is slow, manual and easy to skip under pressure.",
-      "Build with Genie does the reading. It ingests the raw material wherever it lives, clusters it into themes, and hands you back the signal: the recurring pains, the requests that map to real revenue, and a roadmap ranked by impact, effort and reach. You spend your time on judgment, not on tabs.",
+      "Build with Genie does the reading. It ingests the raw material wherever it lives, clusters it into themes, and hands you back the signal: the recurring pains, the requests that map to real revenue, and a roadmap ranked by impact, effort and reach.",
     ],
     capabilities: [
       {
