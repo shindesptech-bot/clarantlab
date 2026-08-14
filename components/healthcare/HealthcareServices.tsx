@@ -31,7 +31,7 @@ const SERVICES: Service[] = [
     title: "Generative AI in Healthcare",
     icon: ICON_SPARKLE,
     intro:
-      "Generative AI in healthcare helps organizations create faster, smarter, and more personalized experiences for both patients and healthcare professionals. Build with Genie develops secure generative AI solutions that can:",
+      "Generative AI in healthcare helps organizations create faster, smarter, and more personalized experiences for both patients and healthcare professionals. Build with Genie develops a secure generative AI solutions that can:",
     points: [
       "Automate patient communications",
       "Summarize patient records",
