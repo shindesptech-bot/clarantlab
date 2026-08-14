@@ -17,7 +17,6 @@ import { Separator } from "@/components/ui/separator"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import { FaqEditor } from "@/components/admin/FaqEditor"
-import { TIMEZONES, DEFAULT_TIMEZONE, zonedToUtc, utcToZonedInput } from "@/lib/schedule"
 import type { IBlogPostDoc } from "@/types"
 
 function toSlug(s: string) {
@@ -30,7 +29,7 @@ const schema = z.object({
   excerpt: z.string().min(10, "Excerpt must be at least 10 characters").max(500),
   content: z.string().min(1, "Content is required"),
   featuredImage: z.string().optional(),
-  status: z.enum(["draft", "scheduled", "published"]),
+  status: z.enum(["draft", "published"]),
   author: z.string().min(1, "Author is required").max(100),
   tags: z.string().optional(),
   category: z.string().optional(),
@@ -42,18 +41,6 @@ const schema = z.object({
   schemaMarkup: z.string().optional(),
   readMin: z.string().optional(),
   faq: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
-  scheduledLocal: z.string().optional(),
-  scheduledTimezone: z.string().optional(),
-}).superRefine((v, ctx) => {
-  if (v.status !== "scheduled") return
-  if (!v.scheduledLocal) {
-    ctx.addIssue({ code: "custom", path: ["scheduledLocal"], message: "Pick a date and time." })
-    return
-  }
-  const utc = zonedToUtc(v.scheduledLocal, v.scheduledTimezone || DEFAULT_TIMEZONE)
-  if (isNaN(utc.getTime()) || utc.getTime() <= Date.now()) {
-    ctx.addIssue({ code: "custom", path: ["scheduledLocal"], message: "Please select a future date and time." })
-  }
 })
 
 type FormValues = z.infer<typeof schema>
@@ -86,10 +73,6 @@ export function BlogForm({ initial, id }: BlogFormProps) {
       schemaMarkup: initial?.schemaMarkup ?? "",
       readMin: initial?.readMin ? String(initial.readMin) : "",
       faq: initial?.faq ?? [],
-      scheduledTimezone: initial?.scheduledTimezone ?? DEFAULT_TIMEZONE,
-      scheduledLocal: initial?.scheduledAt
-        ? utcToZonedInput(initial.scheduledAt, initial?.scheduledTimezone ?? DEFAULT_TIMEZONE)
-        : "",
     },
   })
 
@@ -100,7 +83,6 @@ export function BlogForm({ initial, id }: BlogFormProps) {
   const ogImage = watch("ogImage")
   const faq = watch("faq")
   const tagsValue = watch("tags")
-  const statusValue = watch("status")
 
   // Managed taxonomy (Phase 3): suggestions sourced from the Category/Tag
   // collections. Values are still stored as names on the post, so free-text and
@@ -137,18 +119,11 @@ export function BlogForm({ initial, id }: BlogFormProps) {
 
   async function onSubmit(values: FormValues) {
     try {
-      const isScheduled = values.status === "scheduled"
       const payload = {
         ...values,
         tags: values.tags ? values.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
         readMin: values.readMin ? Number(values.readMin) : undefined,
         faq: values.faq ?? [],
-        // Convert the admin's wall-clock time in the chosen zone to an absolute
-        // UTC instant; backend re-validates it is in the future.
-        scheduledAt: isScheduled && values.scheduledLocal
-          ? zonedToUtc(values.scheduledLocal, values.scheduledTimezone || DEFAULT_TIMEZONE).toISOString()
-          : undefined,
-        scheduledTimezone: isScheduled ? values.scheduledTimezone : undefined,
       }
       const res = await fetch(id ? `/api/admin/blog/${id}` : "/api/admin/blog", {
         method: id ? "PUT" : "POST",
@@ -370,7 +345,6 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="scheduled">Schedule</SelectItem>
                           <SelectItem value="published">Published</SelectItem>
                         </SelectContent>
                       </Select>
@@ -378,50 +352,6 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                     </FormItem>
                   )}
                 />
-
-                {statusValue === "scheduled" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: 12, borderRadius: 8, background: "var(--bg-2)", border: "1px solid var(--line)" }}>
-                    <FormField
-                      control={form.control}
-                      name="scheduledLocal"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel style={{ color: "var(--fg)" }}>Scheduled date &amp; time</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="datetime-local"
-                              style={{ background: "var(--bg-1)", borderColor: "var(--line)", color: "var(--fg)" }}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="scheduledTimezone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel style={{ color: "var(--fg)" }}>Timezone</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger style={{ background: "var(--bg-1)", borderColor: "var(--line)", color: "var(--fg)" }}>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {TIMEZONES.map((tz) => (
-                                <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
 
                 <FormField
                   control={form.control}
@@ -471,7 +401,7 @@ export function BlogForm({ initial, id }: BlogFormProps) {
                   <Button type="submit" disabled={isSubmitting}
                     style={{ background: "var(--accent)", color: "#0a0a0a", fontWeight: 600, width: "100%" }}>
                     {isSubmitting && <Loader2 size={14} className="animate-spin mr-1" />}
-                    {isSubmitting ? "Saving..." : statusValue === "scheduled" ? "Schedule Publish" : id ? "Update Post" : "Publish Post"}
+                    {isSubmitting ? "Saving..." : id ? "Update Post" : "Publish Post"}
                   </Button>
                 </div>
               </CardContent>

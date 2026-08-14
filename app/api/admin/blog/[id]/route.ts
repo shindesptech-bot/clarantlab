@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { BlogPost } from "@/models/Blog";
 import { guard } from "@/lib/rbac";
 import { sanitizeHtml } from "@/lib/content-html";
-import { cleanFaq, resolveSchedule } from "@/lib/blog-helpers";
+import { cleanFaq } from "@/lib/blog-helpers";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -31,15 +31,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       status, author, tags, category,
       seoTitle, seoDescription, seoKeywords,
       ogImage, imageAlt, schemaMarkup, faq, readMin,
-      scheduledAt, scheduledTimezone,
     } = body;
 
     if (!title || !slug || !excerpt || !content || !author) {
       return NextResponse.json({ error: "Title, slug, excerpt, content, and author are required" }, { status: 400 });
     }
-
-    const sched = resolveSchedule(status, scheduledAt);
-    if ("error" in sched) return NextResponse.json({ error: sched.error }, { status: 400 });
 
     await connectToDatabase();
 
@@ -56,9 +52,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       ogImage, imageAlt, schemaMarkup,
       faq: cleanFaq(faq),
       readMin: readMin || undefined,
-      // Cleared automatically when status leaves "scheduled" (cancel/publish).
-      scheduledAt: sched.scheduledAt,
-      scheduledTimezone: status === "scheduled" ? scheduledTimezone : undefined,
     };
     if (status === "published" && !existing.publishedAt) {
       update.publishedAt = new Date();
@@ -97,8 +90,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 }
 
-// Lightweight state transitions: restore from Trash, or cancel a schedule
-// (scheduled → draft, keeping content). Full edits go through PUT.
+// Lightweight state transition: restore from Trash. Full edits go through PUT.
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const g = await guard("manage:blogs");
@@ -110,16 +102,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     let update: Record<string, unknown> | null = null;
     if (body?.restore) {
       update = { deletedAt: null };
-    } else if (body?.cancelSchedule) {
-      // Only a currently-scheduled post can be cancelled — the status filter
-      // makes this a no-op on anything else.
-      const post = await BlogPost.findOneAndUpdate(
-        { _id: id, status: "scheduled" },
-        { status: "draft", scheduledAt: null, scheduledTimezone: undefined },
-        { new: true },
-      ).lean();
-      if (!post) return NextResponse.json({ error: "Post is not scheduled" }, { status: 409 });
-      return NextResponse.json({ success: true });
     }
     if (!update) {
       return NextResponse.json({ error: "Unsupported operation" }, { status: 400 });

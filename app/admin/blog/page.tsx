@@ -10,10 +10,9 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { formatInZone } from "@/lib/schedule"
 import type { IBlogPostDoc } from "@/types"
 
-const STATUS_BADGE = { published: "success", scheduled: "secondary", draft: "warning" } as const
+const STATUS_BADGE = { published: "success", draft: "warning" } as const
 
 const PAGE_SIZE = 10
 
@@ -62,24 +61,6 @@ export default function BlogPage() {
       else fetchPosts()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete post")
-    }
-  }
-
-  async function handleCancelSchedule(id: string, title: string) {
-    try {
-      const res = await fetch(`/api/admin/blog/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cancelSchedule: true }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || `Cancel failed (${res.status})`)
-      }
-      toast.success(`"${title}" moved back to Draft`)
-      fetchPosts()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to cancel schedule")
     }
   }
 
@@ -132,7 +113,6 @@ export default function BlogPage() {
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="scheduled">Scheduled</SelectItem>
             <SelectItem value="published">Published</SelectItem>
           </SelectContent>
         </Select>
@@ -184,11 +164,6 @@ export default function BlogPage() {
                     <Badge variant={STATUS_BADGE[p.status] ?? "warning"}>
                       {p.status}
                     </Badge>
-                    {p.status === "scheduled" && p.scheduledAt && (
-                      <div style={{ fontSize: 11, color: "var(--fg-2, #888)", marginTop: 4 }}>
-                        {formatInZone(p.scheduledAt, p.scheduledTimezone)}
-                      </div>
-                    )}
                   </TableCell>
                   <TableCell>
                     <code style={{ fontSize: 11, color: "var(--fg-2, #888)", background: "var(--bg-2, #111)", padding: "2px 6px", borderRadius: 4 }}>
@@ -210,15 +185,9 @@ export default function BlogPage() {
                         style={{ borderColor: "var(--line)", color: "var(--fg)", background: "transparent" }}>
                         <Link href={`/admin/blog/${p._id}/edit`}>
                           <Edit2 size={12} />
-                          {p.status === "scheduled" ? "Reschedule" : "Edit"}
+                          Edit
                         </Link>
                       </Button>
-                      {p.status === "scheduled" && (
-                        <Button variant="outline" size="sm" onClick={() => handleCancelSchedule(p._id!, p.title)}
-                          style={{ borderColor: "var(--line)", color: "var(--fg)", background: "transparent" }}>
-                          Cancel Schedule
-                        </Button>
-                      )}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="outline" size="sm"
