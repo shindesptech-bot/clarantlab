@@ -124,7 +124,7 @@ const FAQS: FaqItem[] = [
   { question: "How is AI used in finance?", answer: "AI in finance is commonly used for fraud detection, credit risk analysis, customer service automation, financial forecasting, document processing, compliance monitoring, workflow automation, and personalized financial recommendations." },
   { question: "What are generative AI solutions for financial services?", answer: "Generative AI for financial services helps organizations generate reports, summarize financial documents, answer compliance questions, assist customer support teams, create personalized communications, and provide intelligent knowledge management." },
   { question: "Can AI integrate with our existing financial systems?", answer: "Yes. At Build with Genie, we develop custom AI solutions that integrate with your existing CRM, ERP, banking platforms, loan management systems, insurance software, document repositories, and other enterprise applications." },
-  { question: "Is your AI solution customized for our business?", answer: "Yes. Every organization has unique processes and requirements. We develop fully customized AI solutions for finance that align with your workflows, compliance needs, security standards, and long-term business objectives." },
+  { question: "Is your AI solution customized for our business?", answer: "Yes. Every organization has unique processes and requirements. We develop fully customized AI solutions for finance that a align with your workflows, compliance needs, security standards, and long-term business objectives." },
 ];
 
 /* Layout tokens reused across sections (match the healthcare page rhythm). */
