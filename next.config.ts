@@ -51,12 +51,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // simple-icons exports thousands of named icons — tree-shake to the few used.
-  // (lucide-react is already optimized by Next's defaults.)
-  experimental: {
-    optimizePackageImports: ["simple-icons"],
-  },
-
   // Strict mode for better error detection during development
   reactStrictMode: true,
 };
