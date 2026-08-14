@@ -130,7 +130,7 @@ export const USE_CASES: UseCase[] = [
       },
       {
         title: "Spot what's missing",
-        body: "Beyond what users ask for, the genie flags the silent gaps — churn drivers and friction points that show up in behavior but never make it into a ticket.",
+        body: "Beyond what users ask for, the genie flags the silent gaps — churn drivers and friction points that show up in behavior but never make it into  ticket.",
       },
     ],
     workflow: [
