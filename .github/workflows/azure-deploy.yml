@@ -1,17 +1,18 @@
-# Builds the Next.js app in GitHub Actions (where memory is ample) and deploys
-# the prebuilt `standalone` artifact to Azure App Service. Azure/Oryx does NOT
-# build — it only runs the already-compiled server. This removes the constrained
-# Oryx build box (the cause of the silent OOM during "Running TypeScript ...").
+# Builds the Next.js app in GitHub Actions (ample memory) and deploys the
+# prebuilt `.next` output to Azure App Service, which runs it with
+# `next start -p $PORT`. Azure/Oryx does NOT build — this keeps the memory-heavy
+# TypeScript type-check off the constrained App Service box (the cause of the
+# silent build OOM). Mirrors the working PublicSite deployment model.
 #
-# ONE-TIME SETUP (see the report at the end of the change):
-#   1. Set repo secret AZURE_WEBAPP_PUBLISH_PROFILE (App Service > Get publish profile).
-#   2. Set AZURE_WEBAPP_NAME below to your App Service name.
-#   3. On the App Service, set app settings:
+# ONE-TIME SETUP:
+#   1. Repo secret  AZURE_WEBAPP_PUBLISH_PROFILE  (App Service > Get publish profile).
+#   2. Repo variable AZURE_WEBAPP_NAME            (your App Service name).
+#   3. On the App Service > Settings > Environment variables:
 #        ENABLE_ORYX_BUILD=false
 #        SCM_DO_BUILD_DURING_DEPLOYMENT=false
-#        WEBSITES_PORT=3000        (or set PORT; standalone reads PORT)
-#        HOSTNAME=0.0.0.0
-#      and startup command: node server.js
+#        AUTH_SECRET, MONGODB_URI, CLOUDINARY_*        (runtime env)
+#        NEXT_PUBLIC_SITE_URL=https://<app>.azurewebsites.net
+#      Startup Command:  npm start        (runs `next start -p $PORT`)
 
 name: Deploy to Azure App Service
 
@@ -19,9 +20,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-
-env:
-  AZURE_WEBAPP_NAME: CHANGE_ME_APP_NAME
 
 jobs:
   build-and-deploy:
@@ -37,25 +35,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # postbuild (copy-standalone-assets.mjs) runs automatically after build and
-      # copies `.next/static` and `public` into `.next/standalone`.
-      - name: Build (standalone)
+      - name: Build
         run: npm run build
         env:
-          # Headroom so CI never OOMs on the type-check pass. CI runners have 7GB+.
+          # CI-only headroom for Next's TypeScript type-check pass. Runners have
+          # 7GB+; this is not a production flag and does not disable any check.
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Verify standalone artifact
-        run: |
-          test -f .next/standalone/server.js
-          test -d .next/standalone/.next/static
-          echo "standalone artifact OK"
+      # Drop dev-only deps from the deployed artifact; `next` is a prod dep so
+      # `next start` still works at runtime.
+      - name: Prune dev dependencies
+        run: npm prune --omit=dev
 
-      # Deploys the CONTENTS of .next/standalone as the app root, so server.js is
-      # at wwwroot and static/public sit beside it exactly as standalone expects.
+      - name: Verify build artifact
+        run: |
+          test -d .next
+          test -f .next/BUILD_ID
+          test -x node_modules/.bin/next
+          echo "build artifact OK"
+
+      # Deploys the app (.next + public + node_modules + package.json + config).
+      # Azure runs `npm start` -> `next start -p $PORT`.
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .next/standalone
+          package: .

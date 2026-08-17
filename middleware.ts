@@ -47,7 +47,7 @@ async function verifySession(token: string): Promise<boolean> {
 }
 
 // Module-scope cache of enabled redirect rules, refreshed via the public map
-// endpoint. Keeps the proxy off the DB on the hot path; fail-open on any error.
+// endpoint. Keeps middleware off the DB on the hot path; fail-open on any error.
 type RedirectCache = { map: Record<string, string>; exp: number };
 let redirectCache: RedirectCache | null = null;
 const REDIRECT_TTL_MS = 60_000;
@@ -56,7 +56,16 @@ async function lookupRedirect(pathname: string, origin: string): Promise<string 
   if (pathname.startsWith("/api") || pathname.startsWith("/admin")) return null;
   try {
     if (!redirectCache || redirectCache.exp < Date.now()) {
-      const res = await fetch(`${origin}/api/redirects/map`, { cache: "no-store" });
+      // Fetch over the container-LOCAL loopback, never the public hostname.
+      // On Azure App Service a request to the app's own public URL hairpins out
+      // to Front Door and hangs/fails; 127.0.0.1:$PORT stays in-container.
+      // PORT is set by the platform. 2s timeout so a stalled fetch can never
+      // block the first page request (the whole lookup is fail-open anyway).
+      const mapOrigin = process.env.PORT ? `http://127.0.0.1:${process.env.PORT}` : origin;
+      const res = await fetch(`${mapOrigin}/api/redirects/map`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(2000),
+      });
       const data = res.ok ? await res.json() : { map: {} };
       redirectCache = { map: data.map ?? {}, exp: Date.now() + REDIRECT_TTL_MS };
     }
@@ -69,14 +78,14 @@ async function lookupRedirect(pathname: string, origin: string): Promise<string 
   }
 }
 
-export async function proxy(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Admin API routes: coarse authentication gate returning JSON 401 (never a
   // redirect). Per-permission RBAC is enforced inside each handler via
-  // lib/rbac.ts#guard — this is the defence-in-depth net the Next.js proxy docs
-  // recommend so a forgotten in-route check can't leave an endpoint open. The
-  // auth endpoints (login/logout) must stay reachable while unauthenticated.
+  // lib/rbac.ts#guard — this is the defence-in-depth net the Next.js middleware
+  // docs recommend so a forgotten in-route check can't leave an endpoint open.
+  // The auth endpoints (login/logout) must stay reachable while unauthenticated.
   if (pathname.startsWith("/api/admin")) {
     if (pathname.startsWith("/api/admin/auth")) return NextResponse.next();
     const apiToken = req.cookies.get(ADMIN_COOKIE)?.value;

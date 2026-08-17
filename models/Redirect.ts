@@ -1,7 +1,7 @@
 import { Schema, model, models } from "mongoose";
 import type { IRedirect } from "@/types";
 
-// 301 redirect rules managed from the dashboard and applied by proxy.ts.
+// 301 redirect rules managed from the dashboard and applied by middleware.ts.
 // sourceUrl is a normalised path ("/old-page"); targetUrl is a path or absolute URL.
 const RedirectSchema = new Schema<IRedirect>(
   {

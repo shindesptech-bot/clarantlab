@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 import { SEARCH_INDEXING_ENABLED } from "./lib/seo";
 
 const nextConfig: NextConfig = {
-  // Standalone output for Azure App Service deployment
-  output: "standalone",
+  // Default `.next` output + `next start -p $PORT` on Azure App Service (matches
+  // the working PublicSite deployment). No standalone artifact / server.js.
 
   // While indexing is disabled, attach X-Robots-Tag: noindex, nofollow to every
   // response (covers non-HTML assets that meta tags can't reach). Driven by the
