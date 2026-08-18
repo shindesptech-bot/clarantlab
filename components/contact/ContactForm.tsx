@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import type { ContactFormData, ContactFormErrors } from "@/types";
+import { RecaptchaBox, type RecaptchaHandle } from "@/components/RecaptchaBox";
+import { WEB_TO_LEAD_ACTION, SF_LEAD, FREE_EMAIL, qparam, splitName } from "@/lib/salesforceLead";
+import type { ContactFormData } from "@/types";
 
 const FIELDS = [
-  { key: "name" as const, label: "Full name", placeholder: "Jane Park", required: true, type: "text" },
-  { key: "email" as const, label: "Work email", placeholder: "jane@yourcompany.com", required: true, type: "email" },
-  { key: "company" as const, label: "Company name", placeholder: "Acme Co", required: true, type: "text" },
-  { key: "phone" as const, label: "Phone number (optional)", placeholder: "+1 240 281 0320", required: false, type: "tel" },
+  { key: "name" as const, sfName: "full_name", label: "Full name", placeholder: "Jane Park", type: "text" },
+  { key: "email" as const, sfName: "email", label: "Work email", placeholder: "jane@yourcompany.com", type: "email" },
+  { key: "company" as const, sfName: "company", label: "Company name", placeholder: "Acme Co", type: "text" },
+  { key: "phone" as const, sfName: "phone", label: "Phone number (optional)", placeholder: "+1 240 281 0320", type: "tel" },
 ];
 
 // Mirrors the homepage form input language (BookingSection): translucent fill,
@@ -30,72 +32,54 @@ const inputStyle: React.CSSProperties = {
 const EMPTY: ContactFormData = { name: "", email: "", company: "", phone: "" };
 
 export function ContactForm() {
-  const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submittedName, setSubmittedName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [data, setData] = useState<ContactFormData>(EMPTY);
-  const [errs, setErrs] = useState<ContactFormErrors>({});
+
+  // Hidden Salesforce fields populated synchronously right before native submit.
+  const captchaRef = useRef<RecaptchaHandle>(null);
+  const firstRef = useRef<HTMLInputElement>(null);
+  const lastRef = useRef<HTMLInputElement>(null);
+  const urlRef = useRef<HTMLInputElement>(null);
+  const srcRef = useRef<HTMLInputElement>(null);
+  const medRef = useRef<HTMLInputElement>(null);
+  const campRef = useRef<HTMLInputElement>(null);
 
   function set(k: keyof ContactFormData, v: string) {
     setData((d) => ({ ...d, [k]: v }));
-    setErrs((e) => ({ ...e, [k]: undefined }));
     setFormError(null);
   }
 
-  function validate(): boolean {
-    const e: ContactFormErrors = {};
-    if (!data.name.trim()) e.name = "Required.";
-    if (!data.email.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) e.email = "A valid email please.";
-    if (!data.company.trim()) e.company = "Required.";
-    setErrs(e);
-    return Object.keys(e).length === 0;
+  function fail(ev: React.FormEvent, msg: string) {
+    ev.preventDefault();
+    setFormError(msg);
+    setSubmitting(false);
   }
 
-  async function submit() {
-    if (!validate()) return;
+  function submit(ev: React.FormEvent<HTMLFormElement>) {
+    if (submitting) { ev.preventDefault(); return; } // no double-submit
+
+    // Validate top-to-bottom; any failure blocks the native POST.
+    // (This form has no message field, so there's no description to require.)
+    if (!data.name.trim()) return fail(ev, "Please enter your name.");
+    if (!data.email.trim()) return fail(ev, "Please enter your work email.");
+    if (FREE_EMAIL.test(data.email.trim())) return fail(ev, "Please use your work email.");
+    if (!data.company.trim()) return fail(ev, "Please enter your company name.");
+
+    // reCAPTCHA — this form's own widget (empty also covers "not loaded yet").
+    if (!captchaRef.current?.getResponse()) return fail(ev, "Please confirm you're not a robot.");
+
+    // Passed. Fill hidden Salesforce fields, then let the browser POST to
+    // Web-to-Lead — Salesforce redirects to retURL (/thank-you) on success.
+    const { first, last } = splitName(data.name);
+    if (firstRef.current) firstRef.current.value = first;
+    if (lastRef.current) lastRef.current.value = last;
+    if (urlRef.current) urlRef.current.value = window.location.href;
+    if (srcRef.current) srcRef.current.value = qparam("utm_source");
+    if (medRef.current) medRef.current.value = qparam("utm_medium");
+    if (campRef.current) campRef.current.value = qparam("utm_campaign");
     setSubmitting(true);
-    setFormError(null);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name.trim(),
-          email: data.email.trim(),
-          company: data.company.trim(),
-          phone: data.phone.trim(),
-        }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setFormError(body?.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-
-      setSubmittedName(data.name.trim());
-      setData(EMPTY); // Clear the form after a successful submission.
-      setDone(true);
-    } catch {
-      setFormError("Network error — please check your connection and try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  if (done) {
-    return (
-      <div style={{ border: "1px solid var(--line)", background: "var(--bg-1)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
-        <div style={{ padding: "56px 36px", textAlign: "center" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--accent-soft)", border: "1px solid var(--accent-line)", color: "var(--accent)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 18 }}>✓</div>
-          <h2 style={{ fontSize: 28, marginBottom: 10 }}>Got it, {submittedName.split(" ")[0]}.</h2>
-          <p style={{ color: "var(--fg-dim)", maxWidth: "40ch", margin: "0 auto" }}>
-            Thanks for reaching out — we've received your details and a senior will be in touch within the next business hour.
-          </p>
-        </div>
-      </div>
-    );
+    // No preventDefault — native submit proceeds to Salesforce.
   }
 
   return (
@@ -109,26 +93,38 @@ export function ContactForm() {
           A few details and we'll route you to the right senior.
         </p>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            submit();
-          }}
-        >
+        <form onSubmit={submit} action={WEB_TO_LEAD_ACTION} method="POST" noValidate>
+          {/* Salesforce plumbing */}
+          <input type="hidden" name="oid" defaultValue={SF_LEAD.oid} />
+          <input type="hidden" name="retURL" defaultValue={SF_LEAD.retURL} />
+          <input type="hidden" name="lead_source" defaultValue={SF_LEAD.lead_source} />
+          <input type="hidden" name="recordType" defaultValue={SF_LEAD.recordType} />
+          <input type="hidden" name="first_name" ref={firstRef} />
+          <input type="hidden" name="last_name" ref={lastRef} />
+          {/* UTM / source tracking — Salesforce custom-field IDs (Setup > Web-to-Lead). */}
+          <input type="hidden" name="00N_FULL_URL_ID" ref={urlRef} />
+          <input type="hidden" name="00N_UTM_SOURCE_ID" ref={srcRef} />
+          <input type="hidden" name="00N_UTM_MEDIUM_ID" ref={medRef} />
+          <input type="hidden" name="00N_UTM_CAMPAIGN_ID" ref={campRef} />
+
           {FIELDS.map((field) => (
             <div key={field.key} style={{ marginBottom: 18 }}>
               <label style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-xs)", color: "var(--fg-faint)", letterSpacing: "0.12em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>{field.label}</label>
               <input
                 type={field.type}
+                name={field.sfName}
                 value={data[field.key]}
                 onChange={(e) => set(field.key, e.target.value)}
                 placeholder={field.placeholder}
                 className="contact-field"
-                style={{ ...inputStyle, border: errs[field.key] ? "1px solid #F87171" : "1px solid var(--line-strong)" }}
+                style={inputStyle}
               />
-              {errs[field.key] && <p style={{ color: "#F87171", fontSize: "var(--text-xs)", marginTop: 4 }}>{errs[field.key]}</p>}
             </div>
           ))}
+
+          <div style={{ marginBottom: 18 }}>
+            <RecaptchaBox ref={captchaRef} />
+          </div>
 
           {formError && (
             <p style={{ color: "#F87171", fontSize: "var(--text-sm)", marginTop: 4, marginBottom: 4 }}>{formError}</p>
