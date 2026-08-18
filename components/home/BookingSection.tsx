@@ -1,8 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import { useRef, useState } from "react";
+import Script from "next/script";
+import { ArrowRight } from "lucide-react";
 import { Icon } from "@/components/home/_shared";
+
+// reCAPTCHA v2 (checkbox) is loaded via next/script below; this narrows the
+// global it exposes so getResponse() is typed without an `any` cast.
+declare global {
+  interface Window {
+    grecaptcha?: { getResponse: (widgetId?: number) => string };
+  }
+}
+
+const RECAPTCHA_SITE_KEY = "6LfBF9cZAAAAAKIPmfdRgjbqUBmpZ0yj9KzX6e8d";
+const WEB_TO_LEAD_ACTION =
+  "https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8";
+
+// Reject personal/free inboxes — work email only.
+const FREE_EMAIL =
+  /(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|msn\.com|rediffmail\.com|icloud\.com|aol\.com|mail\.ru|yandex\.ru|mail\.com)$/i;
+
+function qparam(name: string): string {
+  return new URLSearchParams(window.location.search).get(name) || "";
+}
+
+// "John Michael Smith" -> { first: "John Michael", last: "Smith" }.
+// Single word -> first "", last = the word (per spec).
+function splitName(full: string): { first: string; last: string } {
+  const trimmed = (full || "").trim();
+  if (!trimmed) return { first: "", last: "" };
+  const parts = trimmed.split(/\s+/);
+  if (parts.length === 1) return { first: "", last: parts[0] };
+  const last = parts.pop() as string;
+  return { first: parts.join(" "), last };
+}
 
 const PROBLEMS = [
   { label: "Reduce Manual Work", paths: ["M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"] },
@@ -31,47 +63,49 @@ export function BookingSection() {
   const [data, setData] = useState<Form>(EMPTY);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
+
+  // Hidden Salesforce fields populated synchronously right before native submit.
+  const firstRef = useRef<HTMLInputElement>(null);
+  const lastRef = useRef<HTMLInputElement>(null);
+  const urlRef = useRef<HTMLInputElement>(null);
+  const srcRef = useRef<HTMLInputElement>(null);
+  const medRef = useRef<HTMLInputElement>(null);
+  const campRef = useRef<HTMLInputElement>(null);
 
   function set(k: keyof Form, v: string) {
     setData((d) => ({ ...d, [k]: v }));
     setFormError(null);
   }
 
-  async function submit(ev: React.FormEvent) {
+  function fail(ev: React.FormEvent, msg: string) {
     ev.preventDefault();
-    if (!data.name.trim() || !data.email.trim() || !data.company.trim() || !data.message.trim()) {
-      setFormError("Please fill in the required fields.");
-      return;
-    }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
-      setFormError("Please enter a valid work email.");
-      return;
-    }
+    setFormError(msg);
+    setSubmitting(false);
+  }
+
+  function submit(ev: React.FormEvent<HTMLFormElement>) {
+    // Validate top-to-bottom; any failure blocks the native POST.
+    if (!data.name.trim()) return fail(ev, "Please enter your name.");
+    if (!data.email.trim()) return fail(ev, "Please enter your work email.");
+    if (FREE_EMAIL.test(data.email.trim())) return fail(ev, "Please use your work email.");
+    if (!data.company.trim()) return fail(ev, "Please enter your company name.");
+    if (!data.message.trim()) return fail(ev, "Please tell us about your business challenges.");
+
+    // reCAPTCHA — also covers the "script hasn't loaded yet" case (grecaptcha undefined).
+    const token = typeof window !== "undefined" && window.grecaptcha ? window.grecaptcha.getResponse() : "";
+    if (!token) return fail(ev, "Please confirm you're not a robot.");
+
+    // Passed. Fill the hidden Salesforce fields, then let the browser POST to
+    // Web-to-Lead — Salesforce redirects to retURL (/thank-you) on success.
+    const { first, last } = splitName(data.name);
+    if (firstRef.current) firstRef.current.value = first;
+    if (lastRef.current) lastRef.current.value = last;
+    if (urlRef.current) urlRef.current.value = window.location.href;
+    if (srcRef.current) srcRef.current.value = qparam("utm_source");
+    if (medRef.current) medRef.current.value = qparam("utm_medium");
+    if (campRef.current) campRef.current.value = qparam("utm_campaign");
     setSubmitting(true);
-    setFormError(null);
-    try {
-      // /api/contact stores name/email/company/phone; industry & message are sent
-      // for completeness (ignored server-side until the backend is extended).
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name.trim(), email: data.email.trim(), company: data.company.trim(),
-          phone: data.phone.trim(), message: data.message.trim(),
-        }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setFormError(body?.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      setDone(true);
-    } catch {
-      setFormError("Network error. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    // No preventDefault — native submit proceeds to Salesforce.
   }
 
   const cardStyle: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 18, background: "rgba(255,255,255,0.02)", padding: "clamp(22px,3vw,32px)" };
@@ -79,6 +113,8 @@ export function BookingSection() {
 
   return (
     <section id="book" style={{ background: "linear-gradient(180deg, var(--bg-0), var(--bg-footer))" }}>
+      {/* reCAPTCHA v2 checkbox — auto-renders the .g-recaptcha widget once loaded. */}
+      <Script src="https://www.google.com/recaptcha/api.js" strategy="afterInteractive" />
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "clamp(30px,4vw,56px) 28px clamp(48px,6vw,80px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 22 }}>
           {/* problems */}
@@ -99,32 +135,37 @@ export function BookingSection() {
           {/* form */}
           <div style={cardStyle}>
             <h2 style={labelStyle}>Book a Free Consultation</h2>
-            {done ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "40px 12px" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 9999, background: "rgba(59,130,246,0.14)", border: "1px solid var(--accent-line)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
-                  <Check size={30} color="var(--accent-bright)" strokeWidth={2.6} />
-                </div>
-                <h3 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px", color: "#fff" }}>Thank you</h3>
-                <p style={{ fontSize: 14, color: "var(--fg-dim)", margin: 0, maxWidth: 320 }}>Your request is in. An AI expert will reach out within one business day.</p>
+            <form onSubmit={submit} action={WEB_TO_LEAD_ACTION} method="POST" noValidate style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* Salesforce plumbing */}
+              <input type="hidden" name="oid" defaultValue="00D6g000005hvDi" />
+              <input type="hidden" name="retURL" defaultValue="https://buildwithgenie.ai/thank-you" />
+              <input type="hidden" name="lead_source" defaultValue="Website - BuildWithGenie" />
+              <input type="hidden" name="recordType" defaultValue="Web" />
+              <input type="hidden" name="first_name" ref={firstRef} />
+              <input type="hidden" name="last_name" ref={lastRef} />
+              {/* ponytail: plain names — Salesforce ignores these until they're
+                  mapped to real 00N custom-field IDs from Setup > Web-to-Lead. */}
+              <input type="hidden" name="full_url" ref={urlRef} />
+              <input type="hidden" name="utm_source" ref={srcRef} />
+              <input type="hidden" name="utm_medium" ref={medRef} />
+              <input type="hidden" name="utm_campaign" ref={campRef} />
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <input type="text" name="full_name" value={data.name} onChange={(e) => set("name", e.target.value)} maxLength={80} placeholder="Full Name*" style={inputStyle} aria-label="Full name" />
+                <input type="email" name="email" value={data.email} onChange={(e) => set("email", e.target.value)} maxLength={80} placeholder="Work Email*" style={inputStyle} aria-label="Work email" />
+                <input type="text" name="company" value={data.company} onChange={(e) => set("company", e.target.value)} maxLength={80} placeholder="Company Name*" style={inputStyle} aria-label="Company name" />
+                <input type="tel" name="phone" value={data.phone} onChange={(e) => set("phone", e.target.value)} maxLength={40} placeholder="Phone Number" style={inputStyle} aria-label="Phone number" />
               </div>
-            ) : (
-              <form onSubmit={submit} noValidate style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                  <input type="text" value={data.name} onChange={(e) => set("name", e.target.value)} placeholder="Full Name*" style={inputStyle} aria-label="Full name" />
-                  <input type="email" value={data.email} onChange={(e) => set("email", e.target.value)} placeholder="Work Email*" style={inputStyle} aria-label="Work email" />
-                  <input type="text" value={data.company} onChange={(e) => set("company", e.target.value)} placeholder="Company Name*" style={inputStyle} aria-label="Company name" />
-                  <input type="tel" value={data.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone Number" style={inputStyle} aria-label="Phone number" />
-                </div>
-                <textarea rows={4} value={data.message} onChange={(e) => set("message", e.target.value)} placeholder="Tell us about your business challenges*" style={textareaStyle} aria-label="Message" />
-                {formError && <div style={{ fontSize: 16, color: "#F87171" }}>{formError}</div>}
-                <button type="submit" disabled={submitting} className="energy-btn energy-btn-full" style={{ marginTop: 4, opacity: submitting ? 0.7 : 1 }}>
-                  <span className="energy-shimmer" />
-                  <span style={{ position: "relative", zIndex: 2, display: "inline-flex", alignItems: "center", gap: 9 }}>
-                    {submitting ? "Sending…" : "Book Free Consultation"} <ArrowRight size={17} strokeWidth={2.2} />
-                  </span>
-                </button>
-              </form>
-            )}
+              <textarea name="description" rows={4} value={data.message} onChange={(e) => set("message", e.target.value)} placeholder="Tell us about your business challenges*" style={textareaStyle} aria-label="Message" />
+              <div className="g-recaptcha" data-sitekey={RECAPTCHA_SITE_KEY} data-theme="dark" style={{ display: "flex", justifyContent: "center" }} />
+              {formError && <div style={{ fontSize: 16, color: "#F87171" }}>{formError}</div>}
+              <button type="submit" disabled={submitting} className="energy-btn energy-btn-full" style={{ marginTop: 4, opacity: submitting ? 0.7 : 1 }}>
+                <span className="energy-shimmer" />
+                <span style={{ position: "relative", zIndex: 2, display: "inline-flex", alignItems: "center", gap: 9 }}>
+                  {submitting ? "Sending…" : "Book Free Consultation"} <ArrowRight size={17} strokeWidth={2.2} />
+                </span>
+              </button>
+            </form>
           </div>
         </div>
       </div>

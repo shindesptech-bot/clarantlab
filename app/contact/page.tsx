@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { Reveal } from "@/components/home/Reveal";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -15,7 +16,7 @@ const WHAT_NEXT = [
 ];
 
 const DIRECT = [
-  { label: "email", value: "hello@buildwithgenie.com", href: "mailto:hello@buildwithgenie.com" },
+  { label: "email", value: "support@buildwithgenie.com", href: "mailto:support@buildwithgenie.com" },
   { label: "sales", value: "work@buildwithgenie.com", href: "mailto:work@buildwithgenie.com" },
   { label: "security", value: "security@buildwithgenie.com", href: "mailto:security@buildwithgenie.com" },
   { label: "signal", value: "+1 240 281 0320", href: null },
@@ -30,7 +31,7 @@ const HOURS = [
 function InfoBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ border: "1px solid var(--line)", borderRadius: "var(--radius-md)", padding: 24, background: "var(--bg-1)" }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 10 }}>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-xs)", color: "var(--accent)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 10 }}>
         {title}
       </div>
       {children}
@@ -58,10 +59,10 @@ export default function ContactPage() {
           }}
         >
           {/* Form */}
-          <ContactForm />
+          <Reveal><ContactForm /></Reveal>
 
           {/* Sidebar */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+          <Reveal delay={80} style={{ display: "flex", flexDirection: "column", gap: 28 }}>
             <InfoBlock title="What happens next">
               <div style={{ display: "flex", flexDirection: "column", gap: 14, fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--fg-dim)" }}>
                 {WHAT_NEXT.map((step, i) => (
@@ -100,7 +101,7 @@ export default function ContactPage() {
                 ))}
               </div>
             </InfoBlock>
-          </div>
+          </Reveal>
         </div>
       </div>
 

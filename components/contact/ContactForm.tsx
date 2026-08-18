@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 import type { ContactFormData, ContactFormErrors } from "@/types";
 
 const FIELDS = [
@@ -10,17 +11,20 @@ const FIELDS = [
   { key: "phone" as const, label: "Phone number (optional)", placeholder: "+1 240 281 0320", required: false, type: "tel" },
 ];
 
+// Mirrors the homepage form input language (BookingSection): translucent fill,
+// stronger 1px line, 48px height, --radius-md, accent focus glow (scoped CSS below).
 const inputStyle: React.CSSProperties = {
-  background: "var(--bg-0)",
-  border: "1px solid var(--line)",
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid var(--line-strong)",
   color: "var(--fg)",
   fontFamily: "inherit",
-  fontSize: 15,
-  padding: "12px 14px",
-  borderRadius: 8,
+  fontSize: 14,
+  height: 48,
+  padding: "0 14px",
+  borderRadius: "var(--radius-md)",
   outline: "none",
   width: "100%",
-  transition: "border-color 0.15s",
+  transition: "border-color 0.2s, box-shadow 0.2s",
 };
 
 const EMPTY: ContactFormData = { name: "", email: "", company: "", phone: "" };
@@ -96,10 +100,12 @@ export function ContactForm() {
 
   return (
     <div style={{ border: "1px solid var(--line)", background: "var(--bg-1)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+      {/* Accent focus glow — matches the homepage accent system (inputs have no :focus rule inline). */}
+      <style>{`.contact-field:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-soft); }`}</style>
       {/* Body */}
       <div style={{ padding: "36px 36px 32px" }}>
-        <h2 style={{ fontSize: 26, letterSpacing: "-0.02em", marginBottom: 6 }}>Tell us about you</h2>
-        <p style={{ color: "var(--fg-dim)", fontSize: 14, marginBottom: 28 }}>
+        <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--fg-soft)", marginBottom: 10 }}>Tell us about you</h2>
+        <p style={{ color: "var(--fg-dim)", fontSize: "var(--text-sm)", lineHeight: 1.5, marginBottom: 28 }}>
           A few details and we'll route you to the right senior.
         </p>
 
@@ -111,32 +117,35 @@ export function ContactForm() {
         >
           {FIELDS.map((field) => (
             <div key={field.key} style={{ marginBottom: 18 }}>
-              <label style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--fg-faint)", letterSpacing: "0.12em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>{field.label}</label>
+              <label style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-xs)", color: "var(--fg-faint)", letterSpacing: "0.12em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>{field.label}</label>
               <input
                 type={field.type}
                 value={data[field.key]}
                 onChange={(e) => set(field.key, e.target.value)}
                 placeholder={field.placeholder}
-                style={{ ...inputStyle, border: errs[field.key] ? "1px solid #ff8866" : "1px solid var(--line)" }}
+                className="contact-field"
+                style={{ ...inputStyle, border: errs[field.key] ? "1px solid #F87171" : "1px solid var(--line-strong)" }}
               />
-              {errs[field.key] && <p style={{ color: "#ff8866", fontSize: 12, marginTop: 4 }}>{errs[field.key]}</p>}
+              {errs[field.key] && <p style={{ color: "#F87171", fontSize: "var(--text-xs)", marginTop: 4 }}>{errs[field.key]}</p>}
             </div>
           ))}
 
           {formError && (
-            <p style={{ color: "#ff8866", fontSize: 13, marginTop: 4, marginBottom: 4 }}>{formError}</p>
+            <p style={{ color: "#F87171", fontSize: "var(--text-sm)", marginTop: 4, marginBottom: 4 }}>{formError}</p>
           )}
 
-          {/* Navigation */}
-          <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 12 }}>
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 18px", fontSize: 14, borderRadius: 8, border: "1px solid var(--accent)", background: "var(--accent)", color: "#0a0a0a", fontWeight: 500, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.7 : 1 }}
-            >
-              {submitting ? "Sending…" : "Send it"} <span>→</span>
-            </button>
-          </div>
+          {/* Primary CTA — same energy-btn as the homepage hero/booking CTAs. */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="energy-btn energy-btn-full"
+            style={{ marginTop: 8, opacity: submitting ? 0.7 : 1, cursor: submitting ? "not-allowed" : "pointer" }}
+          >
+            <span className="energy-shimmer" />
+            <span style={{ position: "relative", zIndex: 2, display: "inline-flex", alignItems: "center", gap: 9 }}>
+              {submitting ? "Sending…" : "Send it"} <ArrowRight size={17} strokeWidth={2.2} />
+            </span>
+          </button>
         </form>
       </div>
     </div>

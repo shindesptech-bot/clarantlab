@@ -23,7 +23,7 @@ const SERVICES = [
 ];
 
 const CONTACT = [
-  { icon: Mail, label: "hello@buildwithgenie.com", href: "mailto:hello@buildwithgenie.com" },
+  { icon: Mail, label: "support@buildwithgenie.com", href: "mailto:support@buildwithgenie.com" },
   { icon: Phone, label: "+1 240 281 0320", href: "tel:+16175550118" },
   { icon: MapPin, label: "Boston · Lisbon · Bengaluru", href: null },
 ];
