@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const RECAPTCHA_SITE_KEY = "6LfBF9cZAAAAAKIPmfdRgjbqUBmpZ0yj9KzX6e8d";
+const RECAPTCHA_SITE_KEY = "6LfV4YstAAAAAEzLL_Z5fT8_C7AWxDfITQcsF5jN";
 const WEB_TO_LEAD_ACTION =
   "https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8";
 
