@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
-import { ContactForm } from "@/components/contact/ContactForm";
+import { ConsultationForm } from "@/components/ConsultationForm";
 import { Reveal } from "@/components/home/Reveal";
 
 export const metadata: Metadata = {
@@ -58,8 +58,8 @@ export default function ContactPage() {
             padding: "80px 0 120px",
           }}
         >
-          {/* Form */}
-          <Reveal><ContactForm /></Reveal>
+          {/* Form — shared consultation form (identical to the homepage) */}
+          <Reveal><ConsultationForm /></Reveal>
 
           {/* Sidebar */}
           <Reveal delay={80} style={{ display: "flex", flexDirection: "column", gap: 28 }}>

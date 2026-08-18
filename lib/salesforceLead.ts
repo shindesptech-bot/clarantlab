@@ -1,6 +1,5 @@
-// Salesforce Web-to-Lead — shared config + helpers for BOTH lead forms
-// (homepage BookingSection + /contact ContactForm). Single source of truth so
-// the two forms can never drift apart.
+// Salesforce Web-to-Lead — shared config + helpers for the ConsultationForm,
+// which is rendered on both the homepage (BookingSection) and /contact.
 
 export const WEB_TO_LEAD_ACTION =
   "https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8";
