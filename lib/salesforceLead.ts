@@ -12,7 +12,7 @@ export const SF_LEAD = {
 } as const;
 
 // Public client-side value (safe to ship). The secret key must NEVER live here.
-export const RECAPTCHA_SITE_KEY = "6LfV4YstAAAAAEzLL_Z5fT8_C7AWxDfITQcsF5jN";
+export const RECAPTCHA_SITE_KEY = "6LfJQYwtAAAAAMn_V-2kEpFmWtB_eyU22qazscd3";
 
 // Reject personal/free inboxes — work email only.
 export const FREE_EMAIL =
