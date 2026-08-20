@@ -7,17 +7,18 @@ import { WEB_TO_LEAD_ACTION, SF_LEAD, FREE_EMAIL, qparam, splitName } from "@/li
 
 // Shared "Book a Free Consultation" form — rendered identically on the homepage
 // (BookingSection) and on /contact. Salesforce Web-to-Lead: validate → reCAPTCHA
-// → split name + capture UTM → native POST → Salesforce redirects to retURL.
+// checkbox → split name + capture UTM → native POST → Salesforce redirects to
+// retURL (/thank-you). Each instance owns its own reCAPTCHA widget, so multiple
+// copies on one page never interfere.
 
 const inputStyle: React.CSSProperties = {
   width: "100%", height: 48, padding: "0 14px", fontSize: 14, fontFamily: "inherit",
   color: "var(--fg)", background: "rgba(255,255,255,0.03)", border: "1px solid var(--line-strong)",
   borderRadius: 10, outline: "none", transition: "border-color 0.2s, box-shadow 0.2s",
 };
-const textareaStyle: React.CSSProperties = { ...inputStyle, height: "auto", minHeight: 104, padding: "12px 14px", lineHeight: 1.5, resize: "vertical" };
 
-type Form = { name: string; email: string; company: string; phone: string; message: string };
-const EMPTY: Form = { name: "", email: "", company: "", phone: "", message: "" };
+type Form = { name: string; email: string; company: string; phone: string };
+const EMPTY: Form = { name: "", email: "", company: "", phone: "" };
 
 export function ConsultationForm() {
   const [data, setData] = useState<Form>(EMPTY);
@@ -44,21 +45,8 @@ export function ConsultationForm() {
     setSubmitting(false);
   }
 
-  function submit(ev: React.FormEvent<HTMLFormElement>) {
-    if (submitting) { ev.preventDefault(); return; } // no double-submit
-
-    // Validate top-to-bottom; any failure blocks the native POST.
-    if (!data.name.trim()) return fail(ev, "Please enter your name.");
-    if (!data.email.trim()) return fail(ev, "Please enter your work email.");
-    if (FREE_EMAIL.test(data.email.trim())) return fail(ev, "Please use your work email.");
-    if (!data.company.trim()) return fail(ev, "Please enter your company name.");
-    if (!data.message.trim()) return fail(ev, "Please tell us about your business challenges.");
-
-    // reCAPTCHA — this form's own widget (empty also covers "not loaded yet").
-    if (!captchaRef.current?.getResponse()) return fail(ev, "Please confirm you're not a robot.");
-
-    // Passed. Fill the hidden Salesforce fields, then let the browser POST to
-    // Web-to-Lead — Salesforce redirects to retURL (/thank-you) on success.
+  // Split the name + capture URL/UTM into the hidden Salesforce fields.
+  function populateHidden() {
     const { first, last } = splitName(data.name);
     if (firstRef.current) firstRef.current.value = first;
     if (lastRef.current) lastRef.current.value = last;
@@ -66,8 +54,22 @@ export function ConsultationForm() {
     if (srcRef.current) srcRef.current.value = qparam("utm_source");
     if (medRef.current) medRef.current.value = qparam("utm_medium");
     if (campRef.current) campRef.current.value = qparam("utm_campaign");
+  }
+
+  function submit(ev: React.FormEvent<HTMLFormElement>) {
+    if (submitting) { ev.preventDefault(); return; } // no double-submit
+
+    // Validate top-to-bottom; any failure blocks submission. Phone is optional.
+    if (!data.name.trim()) return fail(ev, "Please enter your name.");
+    if (!data.email.trim()) return fail(ev, "Please enter your work email.");
+    if (FREE_EMAIL.test(data.email.trim())) return fail(ev, "Please use your work email.");
+    if (!data.company.trim()) return fail(ev, "Please enter your company name.");
+    // This form's own widget only — never touches another reCAPTCHA on the page.
+    if (!captchaRef.current?.getResponse()) return fail(ev, "Please confirm you're not a robot.");
+
+    populateHidden();
     setSubmitting(true);
-    // No preventDefault — native submit proceeds to Salesforce.
+    // No preventDefault — native POST proceeds to Salesforce, which redirects to retURL.
   }
 
   const cardStyle: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 18, background: "rgba(255,255,255,0.02)", padding: "clamp(22px,3vw,32px)" };
@@ -84,19 +86,18 @@ export function ConsultationForm() {
         <input type="hidden" name="recordType" defaultValue={SF_LEAD.recordType} />
         <input type="hidden" name="first_name" ref={firstRef} />
         <input type="hidden" name="last_name" ref={lastRef} />
-        {/* UTM / source tracking — Salesforce custom-field IDs (Setup > Web-to-Lead). */}
+        {/* UTM / source tracking — replace these placeholder names with the real
+            Salesforce custom-field IDs (Setup > Web-to-Lead) before go-live. */}
         <input type="hidden" name="00N_FULL_URL_ID" ref={urlRef} />
         <input type="hidden" name="00N_UTM_SOURCE_ID" ref={srcRef} />
         <input type="hidden" name="00N_UTM_MEDIUM_ID" ref={medRef} />
         <input type="hidden" name="00N_UTM_CAMPAIGN_ID" ref={campRef} />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <input type="text" name="full_name" value={data.name} onChange={(e) => set("name", e.target.value)} maxLength={80} placeholder="Full Name*" style={inputStyle} aria-label="Full name" />
-          <input type="email" name="email" value={data.email} onChange={(e) => set("email", e.target.value)} maxLength={80} placeholder="Work Email*" style={inputStyle} aria-label="Work email" />
-          <input type="text" name="company" value={data.company} onChange={(e) => set("company", e.target.value)} maxLength={80} placeholder="Company Name*" style={inputStyle} aria-label="Company name" />
-          <input type="tel" name="phone" value={data.phone} onChange={(e) => set("phone", e.target.value)} maxLength={40} placeholder="Phone Number" style={inputStyle} aria-label="Phone number" />
-        </div>
-        <textarea name="description" rows={4} value={data.message} onChange={(e) => set("message", e.target.value)} placeholder="Tell us about your business challenges*" style={textareaStyle} aria-label="Message" />
+        {/* One field per row — inputs are direct flex children (form gap = 14). */}
+        <input type="text" value={data.name} onChange={(e) => set("name", e.target.value)} maxLength={80} placeholder="Full Name*" style={inputStyle} aria-label="Full name" />
+        <input type="email" name="email" value={data.email} onChange={(e) => set("email", e.target.value)} maxLength={80} placeholder="Work Email*" style={inputStyle} aria-label="Work email" />
+        <input type="text" name="company" value={data.company} onChange={(e) => set("company", e.target.value)} maxLength={80} placeholder="Company Name*" style={inputStyle} aria-label="Company name" />
+        <input type="tel" name="phone" value={data.phone} onChange={(e) => set("phone", e.target.value)} maxLength={40} placeholder="Phone Number" style={inputStyle} aria-label="Phone number" />
         <RecaptchaBox ref={captchaRef} style={{ display: "flex", justifyContent: "center" }} />
         {formError && <div style={{ fontSize: 16, color: "#F87171" }}>{formError}</div>}
         <button type="submit" disabled={submitting} className="energy-btn energy-btn-full" style={{ marginTop: 4, opacity: submitting ? 0.7 : 1 }}>

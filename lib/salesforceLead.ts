@@ -11,8 +11,9 @@ export const SF_LEAD = {
   recordType: "012PJ000001iq5Z",
 } as const;
 
-// Public client-side value (safe to ship). The secret key must NEVER live here.
-export const RECAPTCHA_SITE_KEY = "6LfJQYwtAAAAAMn_V-2kEpFmWtB_eyU22qazscd3";
+// Public client-side value (safe to ship). Secret keys must NEVER live here.
+// reCAPTCHA v2 checkbox site key.
+export const RECAPTCHA_SITE_KEY = "6LdqjI8tAAAAAPPFKXNJotV4BIuBFnPNZWKIa1U-";
 
 // Reject personal/free inboxes — work email only.
 export const FREE_EMAIL =

@@ -58,7 +58,7 @@ export default function ContactPage() {
             padding: "80px 0 120px",
           }}
         >
-          {/* Form — shared consultation form (identical to the homepage) */}
+          {/* Form — shared consultation form (v2 checkbox reCAPTCHA) */}
           <Reveal><ConsultationForm /></Reveal>
 
           {/* Sidebar */}
