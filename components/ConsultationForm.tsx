@@ -6,10 +6,10 @@ import { RecaptchaBox, type RecaptchaHandle } from "@/components/RecaptchaBox";
 import { WEB_TO_LEAD_ACTION, SF_LEAD, FREE_EMAIL, qparam, splitName } from "@/lib/salesforceLead";
 
 // Shared "Book a Free Consultation" form — rendered identically on the homepage
-// (BookingSection) and on /contact. Salesforce Web-to-Lead: validate → reCAPTCHA
-// checkbox → split name + capture UTM → native POST → Salesforce redirects to
-// retURL (/thank-you). Each instance owns its own reCAPTCHA widget, so multiple
-// copies on one page never interfere.
+// (BookingSection) and on /contact. Salesforce Web-to-Lead: validate → run the
+// Invisible reCAPTCHA → write its token into g-recaptcha-response → split name +
+// capture UTM → native POST → Salesforce redirects to retURL (/thank-you). Each
+// instance owns its own reCAPTCHA widget, so multiple copies never interfere.
 
 const inputStyle: React.CSSProperties = {
   width: "100%", height: 48, padding: "0 14px", fontSize: 14, fontFamily: "inherit",
@@ -32,6 +32,8 @@ export function ConsultationForm() {
   const srcRef = useRef<HTMLInputElement>(null);
   const medRef = useRef<HTMLInputElement>(null);
   const campRef = useRef<HTMLInputElement>(null);
+  const tokenRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const captchaRef = useRef<RecaptchaHandle>(null);
 
   function set(k: keyof Form, v: string) {
@@ -56,20 +58,24 @@ export function ConsultationForm() {
     if (campRef.current) campRef.current.value = qparam("utm_campaign");
   }
 
-  function submit(ev: React.FormEvent<HTMLFormElement>) {
-    if (submitting) { ev.preventDefault(); return; } // no double-submit
+  async function submit(ev: React.FormEvent<HTMLFormElement>) {
+    ev.preventDefault(); // always: we submit natively after the invisible reCAPTCHA resolves
+    if (submitting) return; // no double-submit
 
     // Validate top-to-bottom; any failure blocks submission. Phone is optional.
     if (!data.name.trim()) return fail(ev, "Please enter your name.");
     if (!data.email.trim()) return fail(ev, "Please enter your work email.");
     if (FREE_EMAIL.test(data.email.trim())) return fail(ev, "Please use your work email.");
     if (!data.company.trim()) return fail(ev, "Please enter your company name.");
-    // This form's own widget only — never touches another reCAPTCHA on the page.
-    if (!captchaRef.current?.getResponse()) return fail(ev, "Please confirm you're not a robot.");
 
-    populateHidden();
     setSubmitting(true);
-    // No preventDefault — native POST proceeds to Salesforce, which redirects to retURL.
+    // Run the Invisible reCAPTCHA (no user interaction unless Google shows a challenge).
+    const token = await captchaRef.current?.execute();
+    if (!token) { setFormError("Verification failed. Please try again."); setSubmitting(false); return; }
+
+    if (tokenRef.current) tokenRef.current.value = token;
+    populateHidden();
+    formRef.current?.submit(); // native POST to Salesforce, which redirects to retURL
   }
 
   const cardStyle: React.CSSProperties = { border: "1px solid var(--line)", borderRadius: 18, background: "rgba(255,255,255,0.02)", padding: "clamp(22px,3vw,32px)" };
@@ -78,7 +84,7 @@ export function ConsultationForm() {
   return (
     <div style={cardStyle}>
       <h2 style={labelStyle}>Book a Free Consultation</h2>
-      <form onSubmit={submit} action={WEB_TO_LEAD_ACTION} method="POST" noValidate style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <form ref={formRef} onSubmit={submit} action={WEB_TO_LEAD_ACTION} method="POST" noValidate style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {/* Salesforce plumbing */}
         <input type="hidden" name="oid" defaultValue={SF_LEAD.oid} />
         <input type="hidden" name="retURL" defaultValue={SF_LEAD.retURL} />
@@ -92,13 +98,15 @@ export function ConsultationForm() {
         <input type="hidden" name="00N_UTM_SOURCE_ID" ref={srcRef} />
         <input type="hidden" name="00N_UTM_MEDIUM_ID" ref={medRef} />
         <input type="hidden" name="00N_UTM_CAMPAIGN_ID" ref={campRef} />
+        {/* Invisible reCAPTCHA token, written right before native submit. */}
+        <input type="hidden" name="g-recaptcha-response" ref={tokenRef} />
 
         {/* One field per row — inputs are direct flex children (form gap = 14). */}
         <input type="text" value={data.name} onChange={(e) => set("name", e.target.value)} maxLength={80} placeholder="Full Name*" style={inputStyle} aria-label="Full name" />
         <input type="email" name="email" value={data.email} onChange={(e) => set("email", e.target.value)} maxLength={80} placeholder="Work Email*" style={inputStyle} aria-label="Work email" />
         <input type="text" name="company" value={data.company} onChange={(e) => set("company", e.target.value)} maxLength={80} placeholder="Company Name*" style={inputStyle} aria-label="Company name" />
         <input type="tel" name="phone" value={data.phone} onChange={(e) => set("phone", e.target.value)} maxLength={40} placeholder="Phone Number" style={inputStyle} aria-label="Phone number" />
-        <RecaptchaBox ref={captchaRef} style={{ display: "flex", justifyContent: "center" }} />
+        <RecaptchaBox ref={captchaRef} />
         {formError && <div style={{ fontSize: 16, color: "#F87171" }}>{formError}</div>}
         <button type="submit" disabled={submitting} className="energy-btn energy-btn-full" style={{ marginTop: 4, opacity: submitting ? 0.7 : 1 }}>
           <span className="energy-shimmer" />

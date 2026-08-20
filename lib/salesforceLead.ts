@@ -12,7 +12,8 @@ export const SF_LEAD = {
 } as const;
 
 // Public client-side value (safe to ship). Secret keys must NEVER live here.
-// reCAPTCHA v2 checkbox site key.
+// reCAPTCHA v2 *Invisible* site key — must be registered as Invisible in the
+// Google reCAPTCHA admin console for size:"invisible" to work.
 export const RECAPTCHA_SITE_KEY = "6LdqjI8tAAAAAPPFKXNJotV4BIuBFnPNZWKIa1U-";
 
 // Reject personal/free inboxes — work email only.

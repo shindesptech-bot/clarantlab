@@ -5,7 +5,8 @@ import Script from "next/script";
 import { RECAPTCHA_SITE_KEY } from "@/lib/salesforceLead";
 
 export type RecaptchaHandle = {
-  getResponse: () => string;
+  // Runs the invisible challenge and resolves with the token (or "" on error).
+  execute: () => Promise<string>;
   reset: () => void;
 };
 
@@ -14,26 +15,38 @@ declare global {
     grecaptcha?: {
       render: (
         el: HTMLElement,
-        opts: { sitekey: string; theme?: "dark" | "light" }
+        opts: {
+          sitekey: string;
+          size?: "invisible";
+          callback?: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
+        }
       ) => number;
-      getResponse: (id?: number) => string;
+      execute: (id?: number) => void;
       reset: (id?: number) => void;
     };
   }
 }
 
-// One self-contained reCAPTCHA v2 checkbox. `render=explicit` + an owned widget
-// id means two boxes on the same page never read each other's response, and
-// getResponse/reset only ever touch this form's widget.
+// One self-contained Invisible reCAPTCHA. No checkbox, no user interaction —
+// execute() triggers the challenge and resolves with the token via the render
+// callback. `render=explicit` + an owned widget id means multiple forms on one
+// page never touch each other's widget.
 export const RecaptchaBox = forwardRef<RecaptchaHandle, { style?: React.CSSProperties }>(
   function RecaptchaBox({ style }, ref) {
     const boxRef = useRef<HTMLDivElement>(null);
     const widgetId = useRef<number | null>(null);
+    const resolveRef = useRef<((token: string) => void) | null>(null);
     const [loaded, setLoaded] = useState(false);
 
     useImperativeHandle(ref, () => ({
-      getResponse: () =>
-        window.grecaptcha && widgetId.current !== null ? window.grecaptcha.getResponse(widgetId.current) : "",
+      execute: () =>
+        new Promise<string>((resolve) => {
+          if (!window.grecaptcha || widgetId.current === null) return resolve("");
+          resolveRef.current = resolve;
+          window.grecaptcha.execute(widgetId.current);
+        }),
       reset: () => {
         if (window.grecaptcha && widgetId.current !== null) window.grecaptcha.reset(widgetId.current);
       },
@@ -50,7 +63,22 @@ export const RecaptchaBox = forwardRef<RecaptchaHandle, { style?: React.CSSPrope
       // if the same element is rendered twice.
       if (!loaded || !el || widgetId.current !== null || el.childElementCount > 0 || !window.grecaptcha?.render) return;
 
-      widgetId.current = window.grecaptcha.render(el, { sitekey: RECAPTCHA_SITE_KEY, theme: "dark" });
+      widgetId.current = window.grecaptcha.render(el, {
+        sitekey: RECAPTCHA_SITE_KEY,
+        size: "invisible",
+        callback: (token) => {
+          resolveRef.current?.(token);
+          resolveRef.current = null;
+        },
+        "error-callback": () => {
+          resolveRef.current?.("");
+          resolveRef.current = null;
+        },
+        "expired-callback": () => {
+          resolveRef.current?.("");
+          resolveRef.current = null;
+        },
+      });
     }, [loaded]);
 
     return (
