@@ -14,6 +14,14 @@ import type { IBlogPostDoc } from "@/types"
 
 const STATUS_BADGE = { published: "success", draft: "warning" } as const
 
+// Same day-granular format the public site uses (lib/blog.ts) — keeps Admin and
+// production dates visually consistent.
+function fmtDate(d?: Date | string | null): string {
+  if (!d) return "—"
+  const date = new Date(d)
+  return isNaN(date.getTime()) ? "—" : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+}
+
 const PAGE_SIZE = 10
 
 export default function BlogPage() {
@@ -135,6 +143,7 @@ export default function BlogPage() {
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Author</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Category</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Status</TableHead>
+                <TableHead style={{ color: "var(--fg-2, #888)" }}>Dates</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)" }}>Slug</TableHead>
                 <TableHead style={{ color: "var(--fg-2, #888)", textAlign: "right" }}>Actions</TableHead>
               </TableRow>
@@ -142,7 +151,7 @@ export default function BlogPage() {
             <TableBody>
               {posts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} style={{ textAlign: "center", padding: 48, color: "var(--fg-2, #888)" }}>
+                  <TableCell colSpan={7} style={{ textAlign: "center", padding: 48, color: "var(--fg-2, #888)" }}>
                     No posts found.
                   </TableCell>
                 </TableRow>
@@ -164,6 +173,11 @@ export default function BlogPage() {
                     <Badge variant={STATUS_BADGE[p.status] ?? "warning"}>
                       {p.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell style={{ fontSize: 11.5, color: "var(--fg-2, #888)", whiteSpace: "nowrap", lineHeight: 1.6 }}>
+                    <div>Created: <span style={{ color: "var(--fg)" }}>{fmtDate(p.createdAt)}</span></div>
+                    <div>Published: <span style={{ color: p.publishedAt ? "var(--fg)" : "var(--fg-2, #888)" }}>{fmtDate(p.publishedAt)}</span></div>
+                    <div>Updated: <span style={{ color: "var(--fg)" }}>{fmtDate(p.updatedAt)}</span></div>
                   </TableCell>
                   <TableCell>
                     <code style={{ fontSize: 11, color: "var(--fg-2, #888)", background: "var(--bg-2, #111)", padding: "2px 6px", borderRadius: 4 }}>

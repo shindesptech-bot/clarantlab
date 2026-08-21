@@ -8,7 +8,11 @@ const STATIC_PATHS = [
   "/",
   "/services",
   "/services/ai-integration",
+  "/services/mcp-implementation",
+  "/services/rag-implementation",
   "/industries/healthcare",
+  "/industries/financial-services",
+  "/industries/law-firms",
   "/work",
   "/blog",
   "/use-cases",
@@ -35,7 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // getPublishedPosts already returns [] on DB failure — sitemap stays valid.
   const posts = await getPublishedPosts();
   const blogEntries: MetadataRoute.Sitemap = posts.map((p) => {
-    const d = new Date(p.date);
+    // lastmod = last modification (updatedAt), falling back to publishedAt.
+    const d = new Date(p.updatedAt ?? p.publishedAt ?? p.date);
     return {
       url: `${SITE_URL}/blog/${p.slug}`,
       lastModified: isNaN(d.getTime()) ? now : d,

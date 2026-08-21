@@ -16,7 +16,7 @@ export const NAV_LINKS: NavLink[] = [
     children: [
       { label: "Healthcare", href: "/industries/healthcare" },
       { label: "Financial Services", href: "/industries/financial-services" },
-      { label: "Law", href: "/industries/law" },
+      { label: "Law Firms", href: "/industries/law-firms" },
     ],
   },
   { label: "Work", href: "/work" },

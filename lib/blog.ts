@@ -34,6 +34,8 @@ interface BlogDoc {
   author: string;
   featuredImage?: string;
   createdAt?: Date | string;
+  updatedAt?: Date | string;
+  publishedAt?: Date | string;
   readMin?: number;
   seoTitle?: string;
   seoDescription?: string;
@@ -52,7 +54,11 @@ function toPublic(doc: BlogDoc): PublicPost {
     tags: doc.tags ?? [],
     author: doc.author,
     authorInitials: initials(doc.author),
-    date: formatDate(doc.createdAt),
+    // Public "Published" date = publishedAt. Legacy posts predating the field
+    // fall back to createdAt (their original displayed date) until backfilled.
+    date: formatDate(doc.publishedAt ?? doc.createdAt),
+    publishedAt: doc.publishedAt ? new Date(doc.publishedAt).toISOString() : undefined,
+    updatedAt: doc.updatedAt ? new Date(doc.updatedAt).toISOString() : undefined,
     readTime: doc.readMin ? `${doc.readMin} min` : readingTime(doc.content),
     contentHtml: doc.content,
     featuredImage: doc.featuredImage || "",
@@ -71,7 +77,7 @@ export async function getPublishedPosts(): Promise<PublicPost[]> {
   try {
     const conn = await connectToDatabase();
     const docs = await BlogPost.find({ status: "published", deletedAt: null })
-      .sort({ createdAt: -1 })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .lean<BlogDoc[]>();
     // TEMP diagnostic — visible in Vercel function logs.
     console.log(`[blog] db="${conn.connection.name}" publishedPosts=${docs.length}`);
@@ -97,7 +103,7 @@ export async function getRelatedPosts(slug: string, limit = 3): Promise<PublicPo
   try {
     await connectToDatabase();
     const docs = await BlogPost.find({ status: "published", slug: { $ne: slug }, deletedAt: null })
-      .sort({ createdAt: -1 })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .limit(limit)
       .lean<BlogDoc[]>();
     return docs.map(toPublic);

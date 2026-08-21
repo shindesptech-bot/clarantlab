@@ -25,7 +25,7 @@ const SERVICES = [
 const CONTACT = [
   { icon: Mail, label: "support@buildwithgenie.com", href: "mailto:support@buildwithgenie.com" },
   { icon: Phone, label: "+1 240 281 0320", href: "tel:+16175550118" },
-  { icon: MapPin, label: "Boston · Lisbon · Bengaluru", href: null },
+  { icon: MapPin, label: "3045 Sycamore Bluff, Cumming, GA, USA 30041", href: null },
 ];
 
 // Inline brand glyphs (currentColor) — lucide 1.x dropped brand icons and

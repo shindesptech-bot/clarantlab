@@ -192,7 +192,9 @@ export interface PublicPost {
   tags: string[];
   author: string;
   authorInitials: string;
-  date: string;
+  date: string; // formatted publication date (publishedAt) for display
+  publishedAt?: string; // ISO — for datePublished / OG article:published_time
+  updatedAt?: string; // ISO — for dateModified / OG article:modified_time
   readTime: string;
   contentHtml: string;
   featuredImage?: string;
