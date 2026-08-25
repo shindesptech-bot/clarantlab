@@ -79,14 +79,14 @@ export default function RootLayout({
           }}
         />
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-L3R46LKY82"
+          src="https://www.googletagmanager.com/gtag/js?id=G-YJ7SCYBXJG"
           strategy="afterInteractive"
         />
         <Script id="gtag-init" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-L3R46LKY82');`}
+gtag('config', 'G-YJ7SCYBXJG');`}
         </Script>
         <Navbar />
         <main style={{ flex: 1 }}>{children}</main>
